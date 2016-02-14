@@ -1,0 +1,59 @@
+apply plugin: 'java'
+apply plugin: 'antlr'
+apply plugin: 'application'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    antlr       'org.antlr:antlr4:4.5.2-1'
+    compile     'com.beust:jcommander:1.48'
+    compile     'org.fusesource.jansi:jansi:1.11'
+    testCompile 'junit:junit:4.12'
+}
+
+version = "0.1.0"
+mainClassName = 'fr.loganbraga.hogwash.Hogwash'
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Hogwash',
+                   'Implementation-Version': version,
+                   'Application-Name': 'Hogwash',
+                   'Main-Class': mainClassName
+    }
+}
+
+task copyLicense {
+    outputs.file new File("$buildDir/LICENSE")
+        doLast {
+            copy {
+                from "LICENSE"
+                into "$buildDir"
+            }
+        }
+}
+
+applicationDistribution.from(copyLicense) {
+    into ""
+}
+
+javadoc {
+    options.charSet = 'UTF-8'
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Hogwash',
+            'Implementation-Version': version,
+            'Main-Class': mainClassName
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+generateGrammarSource {
+    arguments += ["-visitor", "-no-listener"]
+}
