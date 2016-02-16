@@ -55,5 +55,5 @@ task fatJar(type: Jar) {
 }
 
 generateGrammarSource {
-    arguments += ["-visitor", "-no-listener"]
+    arguments += ["-visitor"]
 }

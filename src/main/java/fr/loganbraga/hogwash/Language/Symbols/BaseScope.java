@@ -1,6 +1,7 @@
 package fr.loganbraga.hogwash.Language.Symbols;
 
 import fr.loganbraga.hogwash.Language.Symbols.*;
+import java.util.Collection;
 
 public abstract class BaseScope implements Scope {
 	protected Scope enclosingScope;
@@ -22,16 +23,20 @@ public abstract class BaseScope implements Scope {
 		return null;
 	}
 
-	public void define(Symbol symbol) {
-		try {
-			this.symbols.addEntry(symbol);
-		} catch (SymbolAlreadyExistsException e) {
-
-		}
+	public void define(Symbol symbol) throws SymbolAlreadyExistsException {
+		this.symbols.addEntry(symbol);
 		symbol.setScope(this);
 	}
 
 	public Scope getEnclosingScope() {
 		return this.enclosingScope;
+	}
+
+	public Collection<Symbol> getAllSymbols() {
+		return this.symbols.getAllSymbols();
+	}
+
+	public String toString() {
+		return this.getScopeName() + ": " + this.symbols.toString();
 	}
 }

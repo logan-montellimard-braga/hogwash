@@ -3,6 +3,7 @@ package fr.loganbraga.hogwash.Language.Symbols;
 import fr.loganbraga.hogwash.Language.Symbols.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Collection;
 
 public class SymbolDictionary {
 	protected Map<String, Symbol> symbols;
@@ -12,7 +13,8 @@ public class SymbolDictionary {
 	}
 
 	public void addEntry(Symbol symbol) throws SymbolAlreadyExistsException {
-		if (this.getEntry(symbol.getName()) != null)
+		Symbol s = this.getEntry(symbol.getName());
+		if (s != null)
 			throw new SymbolAlreadyExistsException(symbol);
 
 		this.symbols.put(symbol.getName(), symbol);
@@ -24,5 +26,13 @@ public class SymbolDictionary {
 
 	public Symbol getEntry(String name) {
 		return this.symbols.get(name);
+	}
+
+	public Collection<Symbol> getAllSymbols() {
+		return this.symbols.values();
+	}
+
+	public String toString() {
+		return this.symbols.values().toString();
 	}
 }

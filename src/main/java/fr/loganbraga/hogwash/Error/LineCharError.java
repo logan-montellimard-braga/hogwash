@@ -28,7 +28,7 @@ public class LineCharError extends BaseError {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.inputName + ":" + this.line + ":" + this.charPos + " ");
+		sb.append(this.inputName + ":" + this.line + ":" + (this.charPos + 1) + " ");
 		sb.append(super.toString());
 		sb.append("\n");
 
@@ -56,7 +56,7 @@ public class LineCharError extends BaseError {
 
 		if (this.errorCharStartPos >= 0 && this.errorCharStopPos >= 0)
 			for (int i = this.errorCharStartPos; i <= this.errorCharStopPos; i++)
-				sb.append(render("@|" + ERROR_COLOR + " " +
+				sb.append(render("@|" + this.getColorByLevel(this.level) + " " +
 							(i == this.errorCharStartPos ? "^" : "~") + "|@"));
 
 		return sb.toString();

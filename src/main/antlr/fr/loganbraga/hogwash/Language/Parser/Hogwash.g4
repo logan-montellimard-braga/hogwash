@@ -26,7 +26,6 @@ sourceElements
 sourceElement
     : statement
     | functionDecl
-    | typeAliasDecl
     ;
 
 statements
@@ -55,14 +54,8 @@ block
     ;
 
 functionDecl
-    : functionVisibility? FUNC name LPAREN formalParameterList? RPAREN
-        functionReturnType?
-        LBRACE functionBody RBRACE
-    ;
-
-functionVisibility
-    : PUBLIC
-    | PRIVATE
+    : FunctionVisibility? FUNC name LPAREN formalParameterList? RPAREN
+        functionReturnType? block
     ;
 
 formalParameterList
@@ -88,10 +81,6 @@ formalParameterDefaultValue
 functionBody
     : statements?
     ;
-
-typeAliasDecl
-	: TYPE name EQUAL typeDecl SEMI
-	;
 
 expression
     : expression LBRACK expression RBRACK               # IndexExpression
@@ -155,7 +144,7 @@ doWhileStatement
     ;
 
 forStatement
-    : FOR LPAREN variableStatement? SEMI expressions? SEMI expressions? SEMI RPAREN
+    : FOR LPAREN variableStatement? SEMI expressions? SEMI expressions? RPAREN
         statement
     ;
 
@@ -239,7 +228,7 @@ assignmentOperator
     ;
 
 typeDecl
-    : type typeDeclSuffix?
+    : T_TYPE typeDeclSuffix?
     ;
 
 typeDeclSuffix
@@ -248,15 +237,7 @@ typeDeclSuffix
     ;
 
 funcTypeDecl
-    : typeDecl
-    | T_VOID
-    ;
-
-type
-    : T_ANY
-    | T_NUM
-    | T_STR
-    | T_REGEX
+    : funcType=(T_TYPE | T_VOID)
     ;
 
 
@@ -334,7 +315,6 @@ name
 LET            : 'let';
 MUT            : 'mut';
 EXT            : 'ext';
-TYPE		   : 'type';
 IF             : 'if';
 ELSE           : 'else';
 FOR            : 'for';
@@ -352,17 +332,14 @@ SWITCH         : 'switch';
 CASE           : 'case';
 DEFAULT        : 'default';
 FUNC           : 'fn';
-PUBLIC         : 'pub';
-PRIVATE        : 'private';
 DELETE         : 'delete';
 TRUE           : 'true';
 FALSE          : 'false';
 
+FunctionVisibility : 'pub' | 'priv';
+
 // Type Keywords
-T_ANY          : 'any';
-T_NUM          : 'number';
-T_STR          : 'string';
-T_REGEX        : 'regex';
+T_TYPE		   : 'any' | 'number' | 'string' | 'regex';
 T_VOID         : 'void';
 
 

@@ -5,6 +5,7 @@ import static org.fusesource.jansi.AnsiRenderer.*;
 
 public class BaseError {
 	protected static final String ERROR_COLOR = "red";
+	protected static final String WARNING_COLOR = "yellow";
 	protected String message;
 	protected ErrorLevel level;
 
@@ -37,9 +38,22 @@ public class BaseError {
 		this.level = level;
 	}
 
+	protected String getColorByLevel(ErrorLevel level) {
+		String color;
+		switch(level) {
+			case WARNING:
+				color = WARNING_COLOR;
+				break;
+			default:
+				color = ERROR_COLOR;
+				break;
+		}
+		return color;
+	}
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("@|" + ERROR_COLOR + " ");
+		sb.append("@|" + this.getColorByLevel(this.level) + " ");
 		sb.append(this.level.name().toLowerCase() + ":|@ ");
 		sb.append("@|bold " + this.message + "|@");
 		return render(sb.toString());

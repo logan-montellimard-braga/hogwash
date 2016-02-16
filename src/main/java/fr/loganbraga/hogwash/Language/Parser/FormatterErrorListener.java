@@ -5,11 +5,9 @@ import org.antlr.v4.runtime.*;
 
 public class FormatterErrorListener extends BaseErrorListener {
 
-	protected String inputName;
 	protected ErrorReporter er;
 
-	public FormatterErrorListener(String inputName, ErrorReporter er) {
-		this.inputName = inputName;
+	public FormatterErrorListener(ErrorReporter er) {
 		this.er = er;
 	}
 
@@ -20,7 +18,7 @@ public class FormatterErrorListener extends BaseErrorListener {
 		String input = tokens.getTokenSource().getInputStream().toString();
 		Token token = (Token) symbol;
 
-		BaseError error = new LineCharError(msg, this.inputName, input,
+		BaseError error = new LineCharError(msg, this.er.getInputName(), input,
 				line, charPos, token.getStartIndex(), token.getStopIndex());
 
 		this.er.addError(error);

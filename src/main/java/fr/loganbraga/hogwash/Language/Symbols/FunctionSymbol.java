@@ -1,6 +1,8 @@
 package fr.loganbraga.hogwash.Language.Symbols;
 
 import fr.loganbraga.hogwash.Language.Symbols.*;
+import java.util.Collection;
+import java.util.ArrayList;
 
 public class FunctionSymbol extends Symbol implements Scope {
 	protected SymbolDictionary arguments;
@@ -29,12 +31,8 @@ public class FunctionSymbol extends Symbol implements Scope {
 		return null;
 	}
 
-	public void define(Symbol symbol) {
-		try {
-			this.arguments.addEntry(symbol);
-		} catch (SymbolAlreadyExistsException e) {
-
-		}
+	public void define(Symbol symbol) throws SymbolAlreadyExistsException {
+		this.arguments.addEntry(symbol);
 		symbol.setScope(this);
 	}
 
@@ -43,10 +41,18 @@ public class FunctionSymbol extends Symbol implements Scope {
 	}
 
 	public String getScopeName() {
-		return this.name;
+		return "fn " + this.name;
 	}
 
 	public FunctionVisibility getVisibility() {
 		return this.visibility;
+	}
+
+	public Collection<Symbol> getAllSymbols() {
+		return new ArrayList<Symbol>();
+	}
+
+	public String toString() {
+		return this.getScopeName() + ": " + this.arguments.toString() + " -> " + this.type;
 	}
 }

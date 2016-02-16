@@ -8,6 +8,6 @@ public class GlobalScope extends BaseScope {
 	}
 
 	public String getScopeName() {
-		return "global";
+		return "global scope";
 	}
 }

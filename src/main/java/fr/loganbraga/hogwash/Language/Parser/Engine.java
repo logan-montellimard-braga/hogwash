@@ -5,7 +5,6 @@ import fr.loganbraga.hogwash.Language.Parser.HogwashLexer;
 import fr.loganbraga.hogwash.Language.Parser.HogwashParser;
 
 import fr.loganbraga.hogwash.Error.ErrorReporter;
-import fr.loganbraga.hogwash.Error.QuickFailErrorReporter;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -15,19 +14,24 @@ import java.io.IOException;
 public class Engine {
 
 	protected HogwashParser parser;
+	protected ParseTree tree;
 	
-	public Engine(InputStream is, String inputName, ErrorReporter er) throws IOException {
+	public Engine(InputStream is, ErrorReporter er) throws IOException {
 		ANTLRInputStream input = new ANTLRInputStream(is);
 		HogwashLexer lexer = new HogwashLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		this.parser = new HogwashParser(tokens);
 
 		this.parser.removeErrorListeners();
-		this.parser.addErrorListener(new FormatterErrorListener(inputName, er));
+		this.parser.addErrorListener(new FormatterErrorListener(er));
 	}
 
 	public void parse() {
 		this.parser.setBuildParseTree(true);
-		ParseTree tree = this.parser.compilationUnit();
+		this.tree = this.parser.compilationUnit();
+	}
+
+	public ParseTree getTree() {
+		return this.tree;
 	}
 }

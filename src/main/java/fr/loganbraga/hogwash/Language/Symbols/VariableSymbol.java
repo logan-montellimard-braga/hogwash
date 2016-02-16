@@ -20,11 +20,16 @@ public class VariableSymbol extends Symbol {
 		this.exportable = exportable;
 	}
 
+
 	public boolean isExportable() {
 		return this.exportable;
 	}
 
 	public boolean isMutable() {
 		return this.mutable;
+	}
+
+	public String toString() {
+		return (this.exportable ? "ext " : "") + (this.mutable ? "mut " : "") + this.name + ": " + this.type.getName();
 	}
 }

@@ -20,6 +20,9 @@ public class Parameters {
 	@Parameter(names = "--quick-fail", description = "If set, exit after first error.")
 	public boolean quickFail;
 
+	@Parameter(names = "--no-warnings", description = "If set, disable warnings.")
+	public boolean noWarnings;
+
 	@Parameter(names = "--help", description = "Show this help and exit.", help = true)
 	public boolean help;
 
@@ -27,6 +30,7 @@ public class Parameters {
 	public Parameters(String programName, String version, ErrorReporter er) {
 		this.files = new ArrayList<String>();
 		this.quickFail = false;
+		this.noWarnings = false;
 		this.help = false;
 
 		this.programName = programName;
@@ -46,14 +50,16 @@ public class Parameters {
 		}
 	}
 
-	public void printHelp() {
-		this.printHelp(this.programName + " v" + this.version);
+	public String printHelp() {
+		return this.printHelp(this.programName + " v" + this.version);
 	}
 
-	public void printHelp(String preMessage) {
-		System.out.println(preMessage);
-		System.out.println();
-		this.parser.usage();
+	public String printHelp(String preMessage) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(preMessage);
+		sb.append("\n\n");
+		this.parser.usage(sb);
+		return sb.toString();
 	}
 
 }

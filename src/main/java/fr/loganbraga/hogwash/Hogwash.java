@@ -3,21 +3,20 @@ package fr.loganbraga.hogwash;
 import fr.loganbraga.hogwash.Parameters;
 import fr.loganbraga.hogwash.Error.*;
 import fr.loganbraga.hogwash.Language.Parser.Engine;
+import fr.loganbraga.hogwash.Language.Analyzer.StaticAnalyzer;
 import java.io.*;
 import org.fusesource.jansi.AnsiConsole;
 
 public class Hogwash {
-	private static final String VERSION = "0.1.0";
+	protected static final String VERSION = "0.1.0";
 
-	public static void main(String[] args) throws Exception {
-		AnsiConsole.systemInstall();
-
-		QuickFailErrorReporter preER = new QuickFailErrorReporter(System.err, 1);
+	public void run(String[] args) {
+		ErrorReporter preER = new ErrorReporter("<stdin>", 1);
 
 		Parameters parameters = new Parameters("Hogwash", VERSION, preER);
 		parameters.parse(args);
 		if (parameters.help || args.length == 0) {
-			parameters.printHelp();
+			System.out.println(parameters.printHelp());
 			System.exit(0);
 		}
 
@@ -33,15 +32,47 @@ public class Hogwash {
 			}
 		}
 
-		ErrorReporter er;
-		if (parameters.quickFail) er = new QuickFailErrorReporter(System.err, 1);
-		else er = new ErrorReporter(System.err);
+		this.process(parameters, inputName, is);
+	}
 
-		Engine parser = new Engine(is, inputName, er);
+	protected void process(Parameters parameters, String inputName, InputStream is) {
+		ErrorReporter er;
+		if (parameters.quickFail)
+			er = new ErrorReporter(inputName, 1);
+		else er = new ErrorReporter(inputName);
+
+		Engine parser = null;
+		try {
+			parser = new Engine(is, er);
+		} catch (IOException e) {
+			BaseError error = new BaseError(e.getMessage());
+			er.addError(error);
+			this.handleErrors(er);
+		}
 		parser.parse();
+		this.handleErrors(er);
+
+		StaticAnalyzer analyzer = new StaticAnalyzer("bash", parser.getTree(), er);
+		analyzer.analyze();
+		this.handleErrors(er);
+	}
+
+	protected void handleErrors(ErrorReporter er) {
 		if (er.hasErrors()) {
-			er.report();
+			System.err.println(er.reportErrors());
 			System.exit(1);
+		}
+		if (er.hasWarnings()) System.err.println(er.reportWarnings());
+	}
+
+	public static void main(String[] args) {
+		AnsiConsole.systemInstall();
+
+		Hogwash hogwash = new Hogwash();
+		try {
+			hogwash.run(args);
+		} catch (TooManyErrorsException e) { 
+			hogwash.handleErrors(e.getErrorReporter());
 		}
 
 		AnsiConsole.systemUninstall();
