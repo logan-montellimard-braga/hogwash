@@ -115,11 +115,11 @@ public class DefinePhase extends HogwashBaseListener {
 		int charPosStop = charPosStart + name.length() - 1;
 
 		String input = token.getInputStream().toString();
-		String message = "name `" + name + "` is already defined in this scope (" + this.currentScope.getScopeName() + ")";
+		ErrorMessage message = new ErrorMessage(ErrorKind.VAR_ALREADY_DEF, name, this.currentScope.getScopeName());
 		ErrorLevel level = ErrorLevel.WARNING;
 
 		if (this.currentScope instanceof FunctionSymbol) {
-			message = "parameter `" + name + "` is already taken for this function";
+			message = new ErrorMessage(ErrorKind.PARAM_NAME_TAKEN, name, this.currentScope.getScopeName());
 			level = ErrorLevel.ERROR;
 		}
 

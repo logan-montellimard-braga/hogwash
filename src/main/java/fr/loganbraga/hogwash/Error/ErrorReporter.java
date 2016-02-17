@@ -1,26 +1,24 @@
 package fr.loganbraga.hogwash.Error;
 
 import fr.loganbraga.hogwash.Error.*;
+import java.util.ResourceBundle;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class ErrorReporter {
 
-	protected static final int DEFAULT_MAX_ERRORS = 50;
 	protected String inputName;
 	protected int maxErrors;
+	protected ResourceBundle errorKeys;
 
 	protected List<BaseError> errors;
 	protected List<BaseError> warnings;
 
-	public ErrorReporter(String inputName) {
-		this(inputName, DEFAULT_MAX_ERRORS);
-	}
-
-	public ErrorReporter(String inputName, int maxErrors) {
+	public ErrorReporter(String inputName, int maxErrors, ResourceBundle errorKeys) {
 		this.inputName = inputName;
 		this.maxErrors = maxErrors;
+		this.errorKeys = errorKeys;
 		this.errors = new ArrayList<BaseError>();
 		this.warnings = new ArrayList<BaseError>();
 	}
@@ -59,7 +57,9 @@ public class ErrorReporter {
 		StringBuilder sb = new StringBuilder();
 		Iterator<BaseError> it = coll.iterator();
 		while (it.hasNext()) {
-			sb.append(it.next() + "\n");
+			BaseError err = it.next();
+			err.setErrorKeys(this.errorKeys);
+			sb.append(err + "\n");
 			if (it.hasNext()) sb.append("\n");
 		}
 

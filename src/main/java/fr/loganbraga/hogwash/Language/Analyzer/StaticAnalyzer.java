@@ -41,7 +41,7 @@ public class StaticAnalyzer {
 		String fileName = "/bootstrap/" + this.shell + "_builtins.txt";
 		InputStream is = StaticAnalyzer.class.getResourceAsStream(fileName);
 		if (is == null) {
-			BaseError error = new BaseError(this.shell + " builtins bootstrapping failed");
+			BaseError error = new BaseError(new ErrorMessage(ErrorKind.BUILTINS_BOOTSTRAP, "bash"));
 			this.er.addError(error);
 			return names;
 		}

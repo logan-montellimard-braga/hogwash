@@ -41,7 +41,7 @@ public class FunctionSymbol extends Symbol implements Scope {
 	}
 
 	public String getScopeName() {
-		return "fn " + this.name;
+		return this.name;
 	}
 
 	public FunctionVisibility getVisibility() {

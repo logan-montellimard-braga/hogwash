@@ -48,18 +48,19 @@ public class ReferencePhase extends HogwashBaseListener {
 		String name = tk.getText();
 		Symbol var = this.currentScope.resolve(name);
 		if (var == null) {
-			this.referenceError(tk, name,
-					"variable `" + name + "` is not declared");
+			ErrorMessage em = new ErrorMessage(ErrorKind.VAR_NOT_FOUND, name);
+			this.referenceError(tk, name, em);
 		} else if (var instanceof FunctionSymbol) {
-			this.referenceError(tk, name,
-					"function `" + name + "` is used as a variable");
+			ErrorMessage em = new ErrorMessage(ErrorKind.FUNC_AS_VAR, name);
+			this.referenceError(tk, name, em);
 		} else {
 			int referencePosition = tk.getTokenIndex();
 			VariableSymbol v = (VariableSymbol) var;
 			v.setIsUsed(true);
-			if (referencePosition < v.getToken().getTokenIndex())
-				this.referenceError(tk, name,
-						"variable `" + name + "` is used before its declaration");
+			if (referencePosition < v.getToken().getTokenIndex()) {
+				ErrorMessage em = new ErrorMessage(ErrorKind.VAR_FORWARD_REF, name);
+				this.referenceError(tk, name, em);
+			}
 		}
 	}
 
@@ -69,17 +70,17 @@ public class ReferencePhase extends HogwashBaseListener {
 		String name = tk.getText();
 		Symbol func = this.currentScope.resolve(name);
 		if (func == null) {
-			this.referenceError(tk, name,
-					"function `" + name + "` does not exist");
+			ErrorMessage em = new ErrorMessage(ErrorKind.FUNC_NOT_FOUND, name);
+			this.referenceError(tk, name, em);
 		} else if (func instanceof VariableSymbol) {
-			this.referenceError(tk, name,
-					"variable `" + name + "` is used as a function");
+			ErrorMessage em = new ErrorMessage(ErrorKind.VAR_CALLED, name);
+			this.referenceError(tk, name, em);
 		} else {
 			func.setIsUsed(true);
 		}
 	}
 
-	protected void referenceError(Token token, String name, String message) {
+	protected void referenceError(Token token, String name, ErrorMessage message) {
 		int line = token.getLine();
 		int charPosStart = token.getCharPositionInLine();
 		int charPosStop = charPosStart + name.length() - 1;

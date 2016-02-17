@@ -28,14 +28,15 @@ public class DeadCodeFinder {
 					if (input == null)
 						input = s.getToken().getInputStream().toString();
 
-					String obj = s instanceof FunctionSymbol ? "function" : "variable";
-					String act = s instanceof FunctionSymbol ? "called" : "used";
-					String message = obj + " `" + s.getName() + "` is never " + act;
+					ErrorKind k = s instanceof FunctionSymbol
+						? ErrorKind.FUNC_NEVER_CALLED
+						: ErrorKind.VAR_NEVER_USED;
 
 					Token token = s.getToken();
 					int line = token.getLine();
 					int charPos = token.getCharPositionInLine();
 					int charPosStop = charPos + s.getName().length() - 1;
+					ErrorMessage message = new ErrorMessage(k, s.getName());
 					BaseError warn = new LineCharError(message, this.er.getInputName(),
 							input, line, charPos, charPos, charPosStop);
 					warn.setLevel(ErrorLevel.WARNING);

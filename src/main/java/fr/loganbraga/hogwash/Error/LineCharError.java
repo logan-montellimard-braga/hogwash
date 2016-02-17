@@ -11,11 +11,11 @@ public class LineCharError extends BaseError {
 	protected int errorCharStartPos;
 	protected int errorCharStopPos;
 
-	public LineCharError(String message, String inputName, String input, int line, int charPos) {
+	public LineCharError(ErrorMessage message, String inputName, String input, int line, int charPos) {
 		this(message, inputName, input, line, charPos, -1, -1);
 	}
 
-	public LineCharError(String message, String inputName, String input,
+	public LineCharError(ErrorMessage message, String inputName, String input,
 			int line, int charPos, int errorCharStartPos, int errorCharStopPos) {
 		super(message);
 		this.inputName = inputName;
