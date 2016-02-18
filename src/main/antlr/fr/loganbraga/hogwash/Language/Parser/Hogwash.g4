@@ -36,11 +36,7 @@ statement
     : block
     | variableStatement SEMI
     | ifStatement
-    | loopStatement
-    | whileStatement
-    | doWhileStatement SEMI
-    | forStatement
-    | forInStatement
+    | loopingStatement
     | continueStatement SEMI
     | breakStatement SEMI
     | returnStatement SEMI
@@ -48,6 +44,14 @@ statement
     | emptyStatement
     | expression SEMI
     ;
+
+loopingStatement
+	: loopStatement
+	| whileStatement
+	| doWhileStatement SEMI
+	| forStatement
+	| forInStatement
+	;
 
 block
     : LBRACE statement* RBRACE

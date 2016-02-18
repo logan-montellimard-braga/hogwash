@@ -37,6 +37,24 @@ public class ReferencePhase extends SinglePassPhase {
 	}
 
 	@Override
+	public void exitBreakStatement(HogwashParser.BreakStatementContext ctx) {
+		if (!this.isInLoop()) {
+			Token symbol = ctx.BREAK().getSymbol();
+			ErrorMessage em = new ErrorMessage(ErrorKind.LOOP_ST_NO_LOOP, symbol.getText());
+			this.generateError(symbol, em);
+		}
+	}
+
+	@Override
+	public void exitContinueStatement(HogwashParser.ContinueStatementContext ctx) {
+		if (!this.isInLoop()) {
+			Token symbol = ctx.CONTINUE().getSymbol();
+			ErrorMessage em = new ErrorMessage(ErrorKind.LOOP_ST_NO_LOOP, symbol.getText());
+			this.generateError(symbol, em);
+		}
+	}
+
+	@Override
 	public void exitIdentifierExpression(HogwashParser.IdentifierExpressionContext ctx) {
 		Token tk = ctx.name().Identifier().getSymbol();
 		String name = tk.getText();

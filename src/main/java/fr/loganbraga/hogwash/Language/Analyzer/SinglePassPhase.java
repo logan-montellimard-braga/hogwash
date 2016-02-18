@@ -5,17 +5,30 @@ import fr.loganbraga.hogwash.Language.Parser.*;
 import fr.loganbraga.hogwash.Error.*;
 import org.antlr.v4.runtime.Token;
 
-public class SinglePassPhase extends HogwashBaseListener {
+public abstract class SinglePassPhase extends HogwashBaseListener {
 
+	private boolean inLoop;
 	protected ErrorReporter er;
 	protected Scope currentScope;
 	protected SymbolTable st;
 
 	public SinglePassPhase(SymbolTable st, ErrorReporter er) {
+		this.inLoop = false;
 		this.er = er;
 		this.st = st;
 		this.currentScope = null;
 	}
+
+	@Override
+	public void enterLoopingStatement(HogwashParser.LoopingStatementContext ctx) {
+		this.inLoop = true;
+	}
+
+	@Override
+	public void exitLoopingStatement(HogwashParser.LoopingStatementContext ctx) {
+		this.inLoop = false;
+	}
+
 
 	protected void generateError(Token token, ErrorMessage message) {
 		this.generateError(token, message, ErrorLevel.ERROR);
@@ -33,6 +46,10 @@ public class SinglePassPhase extends HogwashBaseListener {
 				input, line, charPosStart, charPosStart, charPosStop);
 		error.setLevel(level);
 		this.er.addError(error);
+	}
+
+	protected boolean isInLoop() {
+		return this.inLoop;
 	}
 
 	public SymbolTable getSymbolTable() {
