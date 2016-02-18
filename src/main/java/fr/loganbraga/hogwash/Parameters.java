@@ -17,11 +17,14 @@ public class Parameters {
 	@Parameter(description = "<files>")
 	public List<String> files;
 
-	@Parameter(names = "--quick-fail", description = "If set, exit after first error.")
+	@Parameter(names = "--quick-fail", description = "Exit after first error.")
 	public boolean quickFail;
 
-	@Parameter(names = "--no-warnings", description = "If set, disable warnings.")
+	@Parameter(names = "--no-warnings", description = "Disable warnings.")
 	public boolean noWarnings;
+
+	@Parameter(names = "--strict", description = "Treat all warnings as errors.")
+	public boolean strict;
 
 	@Parameter(names = "--help", description = "Show this help and exit.", help = true)
 	public boolean help;
@@ -31,6 +34,7 @@ public class Parameters {
 		this.files = new ArrayList<String>();
 		this.quickFail = false;
 		this.noWarnings = false;
+		this.strict = false;
 		this.help = false;
 
 		this.programName = programName;

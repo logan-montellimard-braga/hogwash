@@ -12,15 +12,14 @@ public class Compiler extends Observable {
 
 	protected static final String DEFAULT_TARGET = "bash";
 	protected SymbolTable st;
+	protected File file;
+	protected ErrorReporter er;
 
 	public enum Message {
 		END_INIT,
 		END_PARSING,
 		END_ANALYSIS
 	}
-
-	protected File file;
-	protected ErrorReporter er;
 
 	public Compiler(File file, ErrorReporter er, SymbolTable st) {
 		this(file, er);

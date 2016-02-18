@@ -23,6 +23,24 @@ public class ErrorReporter {
 		this.warnings = new ArrayList<BaseError>();
 	}
 
+	public void setWarningsToErrorsConversion() {
+		this.warnings = new ArrayList<BaseError>() {
+			@Override
+			public boolean add(BaseError e) {
+				e.setLevel(ErrorLevel.ERROR);
+				ErrorReporter.this.addError(e);
+				return true;
+			}
+		};
+	}
+
+	public void setNoWarnings() {
+		this.warnings = new ArrayList<BaseError>() {
+			@Override
+			public boolean add(BaseError e) { return false; }
+		};
+	}
+
 	public void addError(BaseError error) {
 		ErrorLevel level = error.getLevel();
 		switch (level) {

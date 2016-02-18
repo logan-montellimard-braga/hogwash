@@ -22,9 +22,13 @@ public class Hogwash implements Observer {
 	public void run() {
 		if (!this.parameters.files.isEmpty()) {
 			File inputFile = new File(this.parameters.files.get(0));
+
 			int maxErrors = parameters.quickFail ? 1 : 50;
 			ErrorReporter er = new ErrorReporter(
 					inputFile.getPath(), maxErrors, ERROR_KEYS);
+			if (parameters.noWarnings) er.setNoWarnings();
+			if (parameters.strict) er.setWarningsToErrorsConversion();
+
 			Compiler compiler = new Compiler(inputFile, er);
 			compiler.addObserver(this);
 			compiler.compile();
