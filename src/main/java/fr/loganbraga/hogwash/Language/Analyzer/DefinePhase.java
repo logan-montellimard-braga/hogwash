@@ -5,16 +5,10 @@ import fr.loganbraga.hogwash.Language.Parser.*;
 import fr.loganbraga.hogwash.Error.*;
 import org.antlr.v4.runtime.Token;
 
-public class DefinePhase extends HogwashBaseListener {
-
-	protected ErrorReporter er;
-	protected Scope currentScope;
-	protected SymbolTable st;
+public class DefinePhase extends SinglePassPhase {
 
 	public DefinePhase(SymbolTable st, ErrorReporter er) {
-		this.er = er;
-		this.st = st;
-		this.currentScope = null;
+		super(st, er);
 	}
 
 	@Override
@@ -90,6 +84,11 @@ public class DefinePhase extends HogwashBaseListener {
 		boolean mutable = ctx.MUT() != null;
 		boolean exportable = ctx.EXT() != null;
 		this.defineVariable(ctx.typeDecl(), name, mutable, exportable);
+
+		if (!mutable && ctx.variableInit() == null) {
+			ErrorMessage message = new ErrorMessage(ErrorKind.CONST_NOT_SET, name.getText());
+			this.generateError(name, message);
+		}
 	}
 
 	protected void defineVariable(HogwashParser.TypeDeclContext ctx,
@@ -110,40 +109,33 @@ public class DefinePhase extends HogwashBaseListener {
 	}
 
 	protected void alreadyExistsError(Token token, Symbol s) {
-		int line = token.getLine();
-		int charPosStart = token.getCharPositionInLine();
 		String name = token.getText();
-		int charPosStop = charPosStart + name.length() - 1;
-
-		String input = token.getInputStream().toString();
-		String inputName = ((NamedInputStream) token.getInputStream()).getName();
 		ErrorMessage message;
-		ErrorLevel level;
+		ErrorLevel level = ErrorLevel.ERROR;
+
+		Token originalDef = this.currentScope.resolve(name).getToken();
+		NamedInputStream nis = (NamedInputStream) originalDef.getInputStream();
+		String originalDefFile = nis.getName();
+		int originalDefLine = originalDef.getLine();
+		int originalDefChar = originalDef.getCharPositionInLine() + 1;
+
 		if (s instanceof FunctionSymbol) {
-			message = new ErrorMessage(ErrorKind.FUNC_ALREADY_DEF, name);
-			level = ErrorLevel.ERROR;
+			Token originalFunc = this.currentScope.resolve(name).getToken();
+			message = new ErrorMessage(ErrorKind.FUNC_ALREADY_DEF, name,
+					originalDefFile, originalDefLine, originalDefChar);
 		} else {
-			String scopeName;
-			if (this.currentScope.getEnclosingScope() instanceof FunctionSymbol)
-				scopeName = "function " + this.currentScope.getEnclosingScope().getScopeName();
-			else scopeName = this.currentScope.getScopeName();
-			message = new ErrorMessage(ErrorKind.VAR_ALREADY_DEF, name, scopeName);
+			message = new ErrorMessage(ErrorKind.VAR_ALREADY_DEF, name,
+					originalDefFile, originalDefLine, originalDefChar);
 			level = ErrorLevel.WARNING;
 		}
 
 		if (this.currentScope instanceof FunctionSymbol) {
-			message = new ErrorMessage(ErrorKind.PARAM_NAME_TAKEN, name, this.currentScope.getScopeName());
+			message = new ErrorMessage(ErrorKind.PARAM_NAME_TAKEN,
+					name, this.currentScope.getScopeName());
 			level = ErrorLevel.ERROR;
 		}
 
-		BaseError error = new LineCharError(message, inputName,
-				input, line, charPosStart, charPosStart, charPosStop);
-		error.setLevel(level);
-		this.er.addError(error);
-	}
-
-	public SymbolTable getSymbolTable() {
-		return this.st;
+		this.generateError(token, message, level);
 	}
 
 }
