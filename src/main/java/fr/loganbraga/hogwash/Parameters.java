@@ -45,7 +45,8 @@ public class Parameters {
 		try {
 			this.parser.parse(args);
 		} catch (ParameterException e) {
-			BaseError error = new BaseError(new ErrorMessage(ErrorKind.BASE_ERROR, e.getMessage()));
+			BaseError error = new BaseError(new ErrorMessage(
+						ErrorKind.BASE_ERROR, e.getMessage()));
 			this.er.addError(error);
 		}
 	}

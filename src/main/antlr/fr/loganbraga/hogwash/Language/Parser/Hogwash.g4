@@ -5,19 +5,19 @@ grammar Hogwash;
 }
 
 compilationUnit
-    : moduleDecl? importDecl* sourceElements? EOF;
+    : /*moduleDecl?*/ importDecl* sourceElements? EOF;
 
-moduleDecl
-    : MODULE moduleName SEMI
-    ;
+/* moduleDecl */
+/*     : MODULE moduleName SEMI */
+/*     ; */
 
 importDecl
-    : IMPORT moduleName SEMI
+    : IMPORT string SEMI
     ;
 
-moduleName
-    : ModuleName
-    ;
+/* moduleName */
+/*     : ModuleName */
+/*     ; */
 
 sourceElements
     : sourceElement+
@@ -352,9 +352,9 @@ Identifier
     : [a-zA-Z_] [a-zA-Z0-9_]*
     ;
 
-ModuleName
-    : [a-zA-Z] [a-zA-Z_\.]*
-    ;
+/* ModuleName */
+/*     : [a-zA-Z] [a-zA-Z_\.]* */
+/*     ; */
 
 
 // STRINGS

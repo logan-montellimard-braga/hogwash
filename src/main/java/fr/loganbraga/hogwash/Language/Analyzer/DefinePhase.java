@@ -52,7 +52,7 @@ public class DefinePhase extends HogwashBaseListener {
 			this.currentScope.define(function);
 		} catch (SymbolAlreadyExistsException e) {
 			Token startToken = ctx.name().getStart();
-			this.alreadyExistsError(startToken, name);
+			this.alreadyExistsError(startToken, function);
 		}
 
 		this.st.addScope(ctx, function);
@@ -105,18 +105,30 @@ public class DefinePhase extends HogwashBaseListener {
 		try {
 			this.currentScope.define(var);
 		} catch (SymbolAlreadyExistsException e) {
-			this.alreadyExistsError(nameToken, name);
+			this.alreadyExistsError(nameToken, var);
 		}
 	}
 
-	protected void alreadyExistsError(Token token, String name) {
+	protected void alreadyExistsError(Token token, Symbol s) {
 		int line = token.getLine();
 		int charPosStart = token.getCharPositionInLine();
+		String name = token.getText();
 		int charPosStop = charPosStart + name.length() - 1;
 
 		String input = token.getInputStream().toString();
-		ErrorMessage message = new ErrorMessage(ErrorKind.VAR_ALREADY_DEF, name, this.currentScope.getScopeName());
-		ErrorLevel level = ErrorLevel.WARNING;
+		ErrorMessage message;
+		ErrorLevel level;
+		if (s instanceof FunctionSymbol) {
+			message = new ErrorMessage(ErrorKind.FUNC_ALREADY_DEF, name);
+			level = ErrorLevel.ERROR;
+		} else {
+			String scopeName;
+			if (this.currentScope.getEnclosingScope() instanceof FunctionSymbol)
+				scopeName = "function " + this.currentScope.getEnclosingScope().getScopeName();
+			else scopeName = this.currentScope.getScopeName();
+			message = new ErrorMessage(ErrorKind.VAR_ALREADY_DEF, name, scopeName);
+			level = ErrorLevel.WARNING;
+		}
 
 		if (this.currentScope instanceof FunctionSymbol) {
 			message = new ErrorMessage(ErrorKind.PARAM_NAME_TAKEN, name, this.currentScope.getScopeName());

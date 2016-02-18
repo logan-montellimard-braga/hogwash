@@ -2,6 +2,7 @@ package fr.loganbraga.hogwash.Error;
 
 import fr.loganbraga.hogwash.Error.*;
 import java.util.ResourceBundle;
+import java.util.MissingResourceException;
 import java.text.MessageFormat;
 
 public class ErrorMessage {
@@ -15,8 +16,14 @@ public class ErrorMessage {
 	}
 
 	public String render(ResourceBundle rb) {
-		String message = rb.getString(this.kind.name());
+		String message = null;
+		try {
+			message = rb.getString(this.kind.name());
+		} catch (MissingResourceException e) {
+			message = "error message not found for " + this.kind.name();
+		}
 		message = MessageFormat.format(message, this.args);
 		return message;
 	}
+
 }

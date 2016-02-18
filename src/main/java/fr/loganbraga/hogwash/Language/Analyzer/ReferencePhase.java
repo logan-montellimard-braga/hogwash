@@ -49,17 +49,17 @@ public class ReferencePhase extends HogwashBaseListener {
 		Symbol var = this.currentScope.resolve(name);
 		if (var == null) {
 			ErrorMessage em = new ErrorMessage(ErrorKind.VAR_NOT_FOUND, name);
-			this.referenceError(tk, name, em);
+			this.referenceError(tk, em);
 		} else if (var instanceof FunctionSymbol) {
 			ErrorMessage em = new ErrorMessage(ErrorKind.FUNC_AS_VAR, name);
-			this.referenceError(tk, name, em);
+			this.referenceError(tk, em);
 		} else {
 			int referencePosition = tk.getTokenIndex();
 			VariableSymbol v = (VariableSymbol) var;
 			v.setIsUsed(true);
 			if (referencePosition < v.getToken().getTokenIndex()) {
 				ErrorMessage em = new ErrorMessage(ErrorKind.VAR_FORWARD_REF, name);
-				this.referenceError(tk, name, em);
+				this.referenceError(tk, em);
 			}
 		}
 	}
@@ -71,19 +71,30 @@ public class ReferencePhase extends HogwashBaseListener {
 		Symbol func = this.currentScope.resolve(name);
 		if (func == null) {
 			ErrorMessage em = new ErrorMessage(ErrorKind.FUNC_NOT_FOUND, name);
-			this.referenceError(tk, name, em);
+			this.referenceError(tk, em);
 		} else if (func instanceof VariableSymbol) {
 			ErrorMessage em = new ErrorMessage(ErrorKind.VAR_CALLED, name);
-			this.referenceError(tk, name, em);
+			this.referenceError(tk, em);
 		} else {
 			func.setIsUsed(true);
 		}
 	}
 
-	protected void referenceError(Token token, String name, ErrorMessage message) {
+	@Override
+	public void exitExtFuncCallExpression(HogwashParser.ExtFuncCallExpressionContext ctx) {
+		Token tk = ctx.ExtIdentifier().getSymbol();
+		String name = tk.getText().substring(1);
+		Symbol func = this.currentScope.resolve(name);
+		if (func != null) {
+			ErrorMessage em = new ErrorMessage(ErrorKind.EXT_FUNC_DEF, name);
+			this.referenceError(tk, em);
+		}
+	}
+
+	protected void referenceError(Token token, ErrorMessage message) {
 		int line = token.getLine();
 		int charPosStart = token.getCharPositionInLine();
-		int charPosStop = charPosStart + name.length() - 1;
+		int charPosStop = charPosStart + token.getText().length() - 1;
 
 		String input = token.getInputStream().toString();
 

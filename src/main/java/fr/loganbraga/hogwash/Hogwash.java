@@ -1,70 +1,47 @@
 package fr.loganbraga.hogwash;
 
+import fr.loganbraga.hogwash.Language.Compiler;
 import fr.loganbraga.hogwash.Parameters;
 import fr.loganbraga.hogwash.Error.*;
-import fr.loganbraga.hogwash.Language.Parser.Engine;
-import fr.loganbraga.hogwash.Language.Analyzer.StaticAnalyzer;
-import java.io.*;
+import java.io.File;
 import java.util.ResourceBundle;
+import java.util.Observer;
+import java.util.Observable;
 import org.fusesource.jansi.AnsiConsole;
 
-public class Hogwash {
+public class Hogwash implements Observer {
+
 	protected static final String VERSION = "0.1.0";
 	protected static ResourceBundle ERROR_KEYS;
+	protected Parameters parameters;
 
-	public void run(String[] args) {
-		ErrorReporter preER = new ErrorReporter("<stdin>", 1, ERROR_KEYS);
-
-		Parameters parameters = new Parameters("Hogwash", VERSION, preER);
-		parameters.parse(args);
-		if (parameters.help || args.length == 0) {
-			System.out.println(parameters.printHelp());
-			System.exit(0);
-		}
-
-		String inputName = "<stdin>";
-		InputStream is = System.in;
-		if (!parameters.files.isEmpty()) {
-			try {
-				inputName = parameters.files.get(0);
-				is = new FileInputStream(inputName);
-			} catch (FileNotFoundException e) {
-				BaseError error = new BaseError(new ErrorMessage(ErrorKind.BASE_ERROR, e.getMessage()));
-				preER.addError(error);
-			}
-		}
-
-		this.process(parameters, inputName, is);
+	public Hogwash(Parameters parameters) {
+		this.parameters = parameters;
 	}
 
-	protected void process(Parameters parameters, String inputName, InputStream is) {
-		ErrorReporter er;
-		if (parameters.quickFail)
-			er = new ErrorReporter(inputName, 1, ERROR_KEYS);
-		else er = new ErrorReporter(inputName, 50, ERROR_KEYS);
-
-		Engine parser = null;
-		try {
-			parser = new Engine(is, er);
-		} catch (IOException e) {
-			BaseError error = new BaseError(new ErrorMessage(ErrorKind.BASE_ERROR, e.getMessage()));
-			er.addError(error);
-			this.handleErrors(er);
+	public void run() {
+		if (!this.parameters.files.isEmpty()) {
+			File inputFile = new File(this.parameters.files.get(0));
+			int maxErrors = parameters.quickFail ? 1 : 50;
+			ErrorReporter er = new ErrorReporter(
+					inputFile.getPath(), maxErrors, ERROR_KEYS);
+			Compiler compiler = new Compiler(inputFile, er);
+			compiler.addObserver(this);
+			compiler.compile();
 		}
-		parser.parse();
-		this.handleErrors(er);
-
-		StaticAnalyzer analyzer = new StaticAnalyzer("bash", parser.getTree(), er);
-		analyzer.analyze();
-		this.handleErrors(er);
 	}
 
 	protected void handleErrors(ErrorReporter er) {
 		if (er.hasErrors()) {
-			System.err.println(er.reportErrors());
+			System.err.print(er.reportErrors());
 			System.exit(1);
 		}
-		if (er.hasWarnings()) System.err.println(er.reportWarnings());
+		if (er.hasWarnings()) System.err.print(er.reportWarnings());
+	}
+
+	public void update(Observable o, Object message) {
+		if (o instanceof Compiler)
+			this.handleErrors(((Compiler) o).getErrorReporter());
 	}
 
 	public static void main(String[] args) {
@@ -72,13 +49,25 @@ public class Hogwash {
 
 		AnsiConsole.systemInstall();
 
-		Hogwash hogwash = new Hogwash();
+		Hogwash hogwash = null;
+		ErrorReporter preArgsER = new ErrorReporter("<stdin>", 1, ERROR_KEYS);
+		Parameters parameters = new Parameters("Hogwash", VERSION, preArgsER);
+
 		try {
-			hogwash.run(args);
+			parameters.parse(args);
+			if (parameters.help || args.length == 0) {
+				System.out.println(parameters.printHelp());
+				System.exit(0);
+			}
+
+			hogwash = new Hogwash(parameters);
+			hogwash.run();
 		} catch (TooManyErrorsException e) { 
-			hogwash.handleErrors(e.getErrorReporter());
+			System.err.print(e.getErrorReporter().reportErrors());
+			System.exit(1);
 		}
 
 		AnsiConsole.systemUninstall();
 	}
+
 }

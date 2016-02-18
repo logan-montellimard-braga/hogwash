@@ -28,6 +28,10 @@ public abstract class BaseScope implements Scope {
 		symbol.setScope(this);
 	}
 
+	public void undefine(Symbol symbol) {
+		this.symbols.removeEntry(symbol);
+	}
+
 	public Scope getEnclosingScope() {
 		return this.enclosingScope;
 	}

@@ -25,6 +25,11 @@ public class DeadCodeFinder {
 			Symbol s = it.next();
 			if (s instanceof FunctionSymbol || s instanceof VariableSymbol) {
 				if (!s.isUsed()) {
+					if (s instanceof FunctionSymbol) {
+						FunctionSymbol f = (FunctionSymbol) s;
+						if (f.getVisibility() == FunctionVisibility.PUBLIC)
+							continue;
+					}
 					if (input == null)
 						input = s.getToken().getInputStream().toString();
 

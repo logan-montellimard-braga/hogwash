@@ -3,17 +3,19 @@ package fr.loganbraga.hogwash.Language.Symbols;
 import fr.loganbraga.hogwash.Language.Symbols.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.ParserRuleContext;
-import java.io.*;
 import java.util.*;
+import java.io.File;
 
 public class SymbolTable {
 
 	protected GlobalScope globalScope;
 	protected Map<ParseTree, Scope> scopes;
+	protected List<File> imports;
 
 	public SymbolTable(List<String> builtins) {
 		this.globalScope = new GlobalScope();
 		this.scopes = new IdentityHashMap<ParseTree, Scope>();
+		this.imports = new ArrayList<File>();
 
 		this.initTypeSystem();
 		this.bootstrapEnvironment(builtins);
@@ -35,7 +37,8 @@ public class SymbolTable {
 			while (it.hasNext()) {
 				String noType = PrimitiveTypeSymbol.DEFAULT_TYPE.name().toLowerCase();
 				PrimitiveTypeSymbol t = (PrimitiveTypeSymbol) this.globalScope.resolve(noType);
-				FunctionSymbol f = new FunctionSymbol(it.next(), t, this.globalScope);
+				FunctionSymbol f = new FunctionSymbol(
+						it.next(), t, this.globalScope, FunctionVisibility.PUBLIC);
 				f.setIsUsed(true);
 				this.globalScope.define(f);
 			}
@@ -55,6 +58,19 @@ public class SymbolTable {
 
 	public Scope getScope(ParserRuleContext ctx) {
 		return this.scopes.get(ctx);
+	}
+
+	public void addImport(File imp) {
+		this.imports.add(imp);
+	}
+
+	public boolean alreadyImported(File imp) {
+		return this.imports.contains(imp);
+	}
+
+	public void reset(boolean resetGlobalScope) {
+		this.scopes.clear();
+		if (resetGlobalScope) this.globalScope = new GlobalScope();
 	}
 
 	public List<Symbol> getAllSymbols() {

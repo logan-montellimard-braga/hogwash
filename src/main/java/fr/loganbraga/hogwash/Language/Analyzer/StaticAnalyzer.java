@@ -1,6 +1,7 @@
 package fr.loganbraga.hogwash.Language.Analyzer;
 
 import fr.loganbraga.hogwash.Language.Symbols.SymbolTable;
+import fr.loganbraga.hogwash.Language.Imports.ModuleImporter;
 import fr.loganbraga.hogwash.Error.*;
 import org.antlr.v4.runtime.tree.*;
 import java.io.*;
@@ -19,19 +20,17 @@ public class StaticAnalyzer {
 		this.er = er;
 	}
 
-	public void analyze() {
-		this.defRef(new ParseTreeWalker());
-	}
-
-	protected void defRef(ParseTreeWalker walker) {
-		SymbolTable st = new SymbolTable(this.populateBuiltins());
+	public void analyze(SymbolTable st) {
+		if (st == null) st = new SymbolTable(this.populateBuiltins());
+		ModuleImporter mi = new ModuleImporter(st, this.er);
 		DefinePhase def = new DefinePhase(st, this.er);
-
-		walker.walk(def, this.tree);
 		ReferencePhase ref = new ReferencePhase(st, this.er);
-		walker.walk(ref, this.tree);
+		DeadCodeFinder dcf = new DeadCodeFinder(st, this.er);
 
-		DeadCodeFinder dcf= new DeadCodeFinder(st, this.er);
+		ParseTreeWalker walker = new ParseTreeWalker();
+		walker.walk(mi, this.tree);
+		walker.walk(def, this.tree);
+		walker.walk(ref, this.tree);
 		dcf.process();
 	}
 
@@ -41,7 +40,8 @@ public class StaticAnalyzer {
 		String fileName = "/bootstrap/" + this.shell + "_builtins.txt";
 		InputStream is = StaticAnalyzer.class.getResourceAsStream(fileName);
 		if (is == null) {
-			BaseError error = new BaseError(new ErrorMessage(ErrorKind.BUILTINS_BOOTSTRAP, "bash"));
+			BaseError error = new BaseError(new ErrorMessage(
+						ErrorKind.BUILTINS_BOOTSTRAP, "bash"));
 			this.er.addError(error);
 			return names;
 		}

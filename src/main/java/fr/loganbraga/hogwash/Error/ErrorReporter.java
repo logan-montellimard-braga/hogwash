@@ -69,4 +69,17 @@ public class ErrorReporter {
 	public String getInputName() {
 		return this.inputName;
 	}
+
+	public void setMaxErrors(int maxErrors) {
+		this.maxErrors = maxErrors;
+	}
+
+	public int getMaxErrors() {
+		return this.maxErrors;
+	}
+
+	public void setInputName(String inputName) {
+		this.inputName = inputName;
+	}
+
 }
