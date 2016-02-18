@@ -3,21 +3,32 @@ package fr.loganbraga.hogwash.Language.Parser;
 // Classes generated from ANTLR4 grammar
 import fr.loganbraga.hogwash.Language.Parser.HogwashLexer;
 import fr.loganbraga.hogwash.Language.Parser.HogwashParser;
+import fr.loganbraga.hogwash.Language.Parser.NamedInputStream;
 
-import fr.loganbraga.hogwash.Error.ErrorReporter;
+import fr.loganbraga.hogwash.Error.*;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
-import java.io.InputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class Engine {
 
 	protected HogwashParser parser;
 	protected ParseTree tree;
 	
-	public Engine(InputStream is, ErrorReporter er) throws IOException {
-		ANTLRInputStream input = new ANTLRInputStream(is);
+	public Engine(File file, ErrorReporter er) {
+		InputStream is = null;
+		NamedInputStream input = null;
+		try {
+			is = new FileInputStream(file);
+			input = new NamedInputStream(is, file.getPath());
+		} catch (IOException e) {
+			BaseError error = new BaseError(
+					new ErrorMessage(ErrorKind.BASE_ERROR, e.getMessage()));
+			er.addError(error);
+			return;
+		}
+
 		HogwashLexer lexer = new HogwashLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		this.parser = new HogwashParser(tokens);

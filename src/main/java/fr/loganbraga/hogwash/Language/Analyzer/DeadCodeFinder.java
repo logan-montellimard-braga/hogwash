@@ -1,6 +1,7 @@
 package fr.loganbraga.hogwash.Language.Analyzer;
 
 import fr.loganbraga.hogwash.Language.Symbols.*;
+import fr.loganbraga.hogwash.Language.Parser.NamedInputStream;
 import fr.loganbraga.hogwash.Error.*;
 import java.util.List;
 import java.util.Iterator;
@@ -20,6 +21,7 @@ public class DeadCodeFinder {
 		List<Symbol> symbols = this.st.getAllSymbols();
 		Iterator<Symbol> it = symbols.iterator();
 		String input = null;
+		String inputName = null;
 
 		while (it.hasNext()) {
 			Symbol s = it.next();
@@ -30,8 +32,10 @@ public class DeadCodeFinder {
 						if (f.getVisibility() == FunctionVisibility.PUBLIC)
 							continue;
 					}
-					if (input == null)
+					if (input == null) {
 						input = s.getToken().getInputStream().toString();
+						inputName = ((NamedInputStream) s.getToken().getInputStream()).getName();
+					}
 
 					ErrorKind k = s instanceof FunctionSymbol
 						? ErrorKind.FUNC_NEVER_CALLED
@@ -42,7 +46,7 @@ public class DeadCodeFinder {
 					int charPos = token.getCharPositionInLine();
 					int charPosStop = charPos + s.getName().length() - 1;
 					ErrorMessage message = new ErrorMessage(k, s.getName());
-					BaseError warn = new LineCharError(message, this.er.getInputName(),
+					BaseError warn = new LineCharError(message, inputName,
 							input, line, charPos, charPos, charPosStop);
 					warn.setLevel(ErrorLevel.WARNING);
 					this.er.addError(warn);

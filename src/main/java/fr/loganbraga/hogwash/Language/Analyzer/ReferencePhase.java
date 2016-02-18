@@ -97,8 +97,9 @@ public class ReferencePhase extends HogwashBaseListener {
 		int charPosStop = charPosStart + token.getText().length() - 1;
 
 		String input = token.getInputStream().toString();
+		String inputName = ((NamedInputStream) token.getInputStream()).getName();
 
-		BaseError error = new LineCharError(message, this.er.getInputName(),
+		BaseError error = new LineCharError(message, inputName,
 				input, line, charPosStart, charPosStart, charPosStop);
 		this.er.addError(error);
 	}

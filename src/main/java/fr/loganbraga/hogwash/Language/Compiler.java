@@ -33,21 +33,10 @@ public class Compiler extends Observable {
 	}
 
 	public void compile() {
-		this.er.setInputName(this.file.getPath());
-
 		FileInputStream is;
-		Engine parser = null;
-		try {
-			is = new FileInputStream(this.file);
-			parser = new Engine(is, er);
-		} catch (IOException e) {
-			BaseError error = new BaseError(
-					new ErrorMessage(ErrorKind.BASE_ERROR, e.getMessage()));
-			this.er.addError(error);
-			this.setChanged();
-			this.notifyObservers(Message.END_INIT);
-			return;
-		}
+		Engine parser = new Engine(this.file, this.er);
+		this.setChanged();
+		this.notifyObservers(Message.END_INIT);
 
 		parser.parse();
 		this.setChanged();

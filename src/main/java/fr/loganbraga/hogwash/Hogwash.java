@@ -24,8 +24,7 @@ public class Hogwash implements Observer {
 			File inputFile = new File(this.parameters.files.get(0));
 
 			int maxErrors = parameters.quickFail ? 1 : 50;
-			ErrorReporter er = new ErrorReporter(
-					inputFile.getPath(), maxErrors, ERROR_KEYS);
+			ErrorReporter er = new ErrorReporter(maxErrors, ERROR_KEYS);
 			if (parameters.noWarnings) er.setNoWarnings();
 			if (parameters.strict) er.setWarningsToErrorsConversion();
 
@@ -54,7 +53,7 @@ public class Hogwash implements Observer {
 		AnsiConsole.systemInstall();
 
 		Hogwash hogwash = null;
-		ErrorReporter preArgsER = new ErrorReporter("<stdin>", 1, ERROR_KEYS);
+		ErrorReporter preArgsER = new ErrorReporter(1, ERROR_KEYS);
 		Parameters parameters = new Parameters("Hogwash", VERSION, preArgsER);
 
 		try {

@@ -116,6 +116,7 @@ public class DefinePhase extends HogwashBaseListener {
 		int charPosStop = charPosStart + name.length() - 1;
 
 		String input = token.getInputStream().toString();
+		String inputName = ((NamedInputStream) token.getInputStream()).getName();
 		ErrorMessage message;
 		ErrorLevel level;
 		if (s instanceof FunctionSymbol) {
@@ -135,7 +136,7 @@ public class DefinePhase extends HogwashBaseListener {
 			level = ErrorLevel.ERROR;
 		}
 
-		BaseError error = new LineCharError(message, this.er.getInputName(),
+		BaseError error = new LineCharError(message, inputName,
 				input, line, charPosStart, charPosStart, charPosStop);
 		error.setLevel(level);
 		this.er.addError(error);

@@ -16,11 +16,12 @@ public class FormatterErrorListener extends BaseErrorListener {
 
 		CommonTokenStream tokens = (CommonTokenStream) recognizer.getInputStream();
 		String input = tokens.getTokenSource().getInputStream().toString();
+		String inputName = ((NamedInputStream) tokens.getTokenSource().getInputStream()).getName();
 		Token token = (Token) symbol;
 
 		ErrorMessage message = new ErrorMessage(ErrorKind.BASE_ERROR, msg);
 
-		BaseError error = new LineCharError(message, this.er.getInputName(), input,
+		BaseError error = new LineCharError(message, inputName, input,
 				line, charPos, token.getStartIndex(), token.getStopIndex());
 
 		this.er.addError(error);

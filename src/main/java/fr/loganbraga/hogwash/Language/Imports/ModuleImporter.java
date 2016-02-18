@@ -43,7 +43,8 @@ public class ModuleImporter extends HogwashBaseListener {
 			int charPosStart = tk.getCharPositionInLine();
 			int charPosStop = charPosStart + tk.getText().length() - 1;
 			String input = tk.getInputStream().toString();
-			BaseError error = new LineCharError(message, this.er.getInputName(),
+			String inputName = ((NamedInputStream) tk.getInputStream()).getName();
+			BaseError error = new LineCharError(message, inputName,
 					input, line, charPosStart, charPosStart, charPosStop);
 			this.er.addError(error);
 		}
@@ -55,7 +56,6 @@ public class ModuleImporter extends HogwashBaseListener {
 	}
 
 	protected void importModules() {
-		String inputName = this.er.getInputName();
 		int maxErrors = this.er.getMaxErrors();
 		this.er.setMaxErrors(1);
 
@@ -70,7 +70,8 @@ public class ModuleImporter extends HogwashBaseListener {
 				int charPosStart = tk.getCharPositionInLine();
 				int charPosStop = charPosStart + tk.getText().length() - 1;
 				String input = tk.getInputStream().toString();
-				BaseError error = new LineCharError(message, this.er.getInputName(),
+				String inputName = ((NamedInputStream) tk.getInputStream()).getName();
+				BaseError error = new LineCharError(message, inputName,
 						input, line, charPosStart, charPosStart, charPosStop);
 				error.setLevel(ErrorLevel.WARNING);
 				this.er.addError(error);
@@ -83,7 +84,6 @@ public class ModuleImporter extends HogwashBaseListener {
 			this.cleanSymbolTable();
 		}
 		this.er.setMaxErrors(maxErrors);
-		this.er.setInputName(inputName);
 	}
 
 	protected void cleanSymbolTable() {

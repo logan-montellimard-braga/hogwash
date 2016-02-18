@@ -8,15 +8,13 @@ import java.util.Iterator;
 
 public class ErrorReporter {
 
-	protected String inputName;
 	protected int maxErrors;
 	protected ResourceBundle errorKeys;
 
 	protected List<BaseError> errors;
 	protected List<BaseError> warnings;
 
-	public ErrorReporter(String inputName, int maxErrors, ResourceBundle errorKeys) {
-		this.inputName = inputName;
+	public ErrorReporter(int maxErrors, ResourceBundle errorKeys) {
 		this.maxErrors = maxErrors;
 		this.errorKeys = errorKeys;
 		this.errors = new ArrayList<BaseError>();
@@ -84,9 +82,6 @@ public class ErrorReporter {
 		return sb.toString();
 	}
 
-	public String getInputName() {
-		return this.inputName;
-	}
 
 	public void setMaxErrors(int maxErrors) {
 		this.maxErrors = maxErrors;
@@ -94,10 +89,6 @@ public class ErrorReporter {
 
 	public int getMaxErrors() {
 		return this.maxErrors;
-	}
-
-	public void setInputName(String inputName) {
-		this.inputName = inputName;
 	}
 
 }
