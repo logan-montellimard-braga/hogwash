@@ -1,6 +1,6 @@
 package fr.loganbraga.hogwash.Language.Analyzer;
 
-import fr.loganbraga.hogwash.Language.Symbols.SymbolTable;
+import fr.loganbraga.hogwash.Language.Analyzer.SymbolTable;
 import fr.loganbraga.hogwash.Language.Imports.ModuleImporter;
 import fr.loganbraga.hogwash.Error.*;
 import org.antlr.v4.runtime.tree.*;
@@ -20,9 +20,9 @@ public class StaticAnalyzer {
 		this.er = er;
 	}
 
-	public void analyze(SymbolTable st) {
+	public void analyze(SymbolTable st, File currentFile) {
 		if (st == null) st = new SymbolTable(this.populateBuiltins());
-		ModuleImporter mi = new ModuleImporter(st, this.er);
+		ModuleImporter mi = new ModuleImporter(st, currentFile, this.er);
 		DefinePhase def = new DefinePhase(st, this.er);
 		ReferencePhase ref = new ReferencePhase(st, this.er);
 		DeadCodeFinder dcf = new DeadCodeFinder(st, this.er);

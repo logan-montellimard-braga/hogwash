@@ -3,7 +3,7 @@ package fr.loganbraga.hogwash.Language;
 import fr.loganbraga.hogwash.Error.*;
 import fr.loganbraga.hogwash.Language.Parser.Engine;
 import fr.loganbraga.hogwash.Language.Analyzer.StaticAnalyzer;
-import fr.loganbraga.hogwash.Language.Symbols.SymbolTable;
+import fr.loganbraga.hogwash.Language.Analyzer.SymbolTable;
 import java.io.*;
 import java.util.Observer;
 import java.util.Observable;
@@ -55,7 +55,7 @@ public class Compiler extends Observable {
 
 		StaticAnalyzer analyzer = new StaticAnalyzer(
 				DEFAULT_TARGET, parser.getTree(), this.er);
-		analyzer.analyze(this.st);
+		analyzer.analyze(this.st, this.file);
 		this.setChanged();
 		this.notifyObservers(Message.END_ANALYSIS);
 	}

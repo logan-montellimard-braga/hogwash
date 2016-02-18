@@ -9,14 +9,19 @@ public class ImportDirective {
 	protected File path;
 	protected Token token;
 	
-	public ImportDirective(String path) {
-		this.path = this.generatePath(path);
+	public ImportDirective(String path, File parent) throws ModuleNotFoundException {
+		this.path = this.generatePath(path, parent);
 		this.token = null;
+		this.checkPath();
 	}
 
-	protected File generatePath(String path) {
+	protected File generatePath(String path, File parent) {
 		File file = new File(path);
+		if (parent.getParent() != null && !file.isAbsolute())
+			file = new File(parent.getParent() + File.separator + path);
+
 		String name = file.getName();
+		path = file.getPath();
 
 		int dot = name.lastIndexOf('.');
 		String ext = dot == -1 ? null : name.substring(dot + 1);
@@ -24,6 +29,10 @@ public class ImportDirective {
 			file = new File(path + "." + DEFAULT_EXTENSION);
 
 		return file;
+	}
+
+	protected void checkPath() throws ModuleNotFoundException {
+		if (!this.path.exists()) throw new ModuleNotFoundException(this);
 	}
 
 	public void setToken(Token token) {

@@ -2,6 +2,7 @@ package fr.loganbraga.hogwash.Language.Imports;
 
 import fr.loganbraga.hogwash.Language.Compiler;
 import fr.loganbraga.hogwash.Language.Imports.ImportDirective;
+import fr.loganbraga.hogwash.Language.Analyzer.SymbolTable;
 import fr.loganbraga.hogwash.Language.Symbols.*;
 import fr.loganbraga.hogwash.Language.Parser.*;
 import fr.loganbraga.hogwash.Error.*;
@@ -15,12 +16,16 @@ public class ModuleImporter extends HogwashBaseListener {
 	protected List<ImportDirective> imports;
     protected ErrorReporter er;
     protected SymbolTable st;
+    protected File currentFile;
 
-	public ModuleImporter(SymbolTable st, ErrorReporter er) {
+	public ModuleImporter(SymbolTable st, File currentFile, ErrorReporter er) {
 		this.st = st;
+		this.currentFile = currentFile;
 		this.er = er;
 		this.imports = new ArrayList<ImportDirective>();
-		this.st.addImport(new File(this.er.getInputName()));
+		try {
+			this.st.addImport(currentFile);
+		} catch (ModuleAlreadyImportedException e) {}
 	}
 
 	@Override
@@ -28,9 +33,20 @@ public class ModuleImporter extends HogwashBaseListener {
 		Token tk = ctx.IMPORT().getSymbol();
 		String path = ctx.string().StringLit().getText().substring(1);
 		path = path.substring(0, path.length() - 1);
-		ImportDirective id = new ImportDirective(path);
-		id.setToken(tk);
-		this.imports.add(id);
+		try {
+			ImportDirective id = new ImportDirective(path, this.currentFile);
+			id.setToken(tk);
+			this.imports.add(id);
+		} catch (ModuleNotFoundException e) {
+			ErrorMessage message = new ErrorMessage(ErrorKind.MODULE_NOT_FOUND, path);
+			int line = tk.getLine();
+			int charPosStart = tk.getCharPositionInLine();
+			int charPosStop = charPosStart + tk.getText().length() - 1;
+			String input = tk.getInputStream().toString();
+			BaseError error = new LineCharError(message, this.er.getInputName(),
+					input, line, charPosStart, charPosStart, charPosStop);
+			this.er.addError(error);
+		}
 	}
 
 	@Override
@@ -44,7 +60,9 @@ public class ModuleImporter extends HogwashBaseListener {
 		this.er.setMaxErrors(1);
 
 		for (ImportDirective id : this.imports) {
-			if (this.st.alreadyImported(id.getPath())) {
+			try {
+				this.st.addImport(id.getPath());
+			} catch (ModuleAlreadyImportedException e) {
 				ErrorMessage message = new ErrorMessage(
 						ErrorKind.REDUNDANT_IMPORT, id.getPath());
 				Token tk = id.getToken();
@@ -58,7 +76,6 @@ public class ModuleImporter extends HogwashBaseListener {
 				this.er.addError(error);
 				continue;
 			}
-			this.st.addImport(id.getPath());
 
 			Compiler compiler = new Compiler(id.getPath(), this.er, this.st);
 			compiler.compile();

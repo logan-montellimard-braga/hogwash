@@ -1,6 +1,7 @@
-package fr.loganbraga.hogwash.Language.Symbols;
+package fr.loganbraga.hogwash.Language.Analyzer;
 
 import fr.loganbraga.hogwash.Language.Symbols.*;
+import fr.loganbraga.hogwash.Language.Imports.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.ParserRuleContext;
 import java.util.*;
@@ -10,12 +11,12 @@ public class SymbolTable {
 
 	protected GlobalScope globalScope;
 	protected Map<ParseTree, Scope> scopes;
-	protected List<File> imports;
+	protected ImportSet importSet;
 
 	public SymbolTable(List<String> builtins) {
 		this.globalScope = new GlobalScope();
 		this.scopes = new IdentityHashMap<ParseTree, Scope>();
-		this.imports = new ArrayList<File>();
+		this.importSet = new ImportSet();
 
 		this.initTypeSystem();
 		this.bootstrapEnvironment(builtins);
@@ -60,12 +61,8 @@ public class SymbolTable {
 		return this.scopes.get(ctx);
 	}
 
-	public void addImport(File imp) {
-		this.imports.add(imp);
-	}
-
-	public boolean alreadyImported(File imp) {
-		return this.imports.contains(imp);
+	public void addImport(File imp) throws ModuleAlreadyImportedException {
+		this.importSet.addImport(imp);
 	}
 
 	public void reset(boolean resetGlobalScope) {
