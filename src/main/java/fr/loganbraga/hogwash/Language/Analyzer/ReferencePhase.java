@@ -124,12 +124,13 @@ public class ReferencePhase extends SinglePassPhase {
 		} else {
 			int referencePosition = tk.getTokenIndex();
 			VariableSymbol v = (VariableSymbol) var;
-			// v.setIsUsed(true);
-			if (referencePosition < v.getToken().getTokenIndex()) {
+			if (v.fromSameModule(tk) &&
+					referencePosition < v.getToken().getTokenIndex()) {
 				ErrorMessage em = new ErrorMessage(ErrorKind.VAR_FORWARD_REF, name);
 				this.generateError(tk, em);
 			}
 		}
 		return var;
 	}
+
 }

@@ -19,16 +19,8 @@ public class DefinePhase extends SinglePassPhase {
 	@Override
 	public void enterFunctionDecl(HogwashParser.FunctionDeclContext ctx) {
 		FunctionVisibility visibility = FunctionVisibility.PRIVATE;
-		if (ctx.FunctionVisibility() != null) {
-			switch(ctx.FunctionVisibility().getText()) {
-				case "pub":
-					visibility = FunctionVisibility.PUBLIC;
-					break;
-				default:
-					visibility = FunctionVisibility.PRIVATE;
-					break;
-			}
-		}
+		if (ctx.PUB() != null)
+			visibility = FunctionVisibility.PUBLIC;
 
 		String name = ctx.name().Identifier().getText();
 
@@ -83,7 +75,7 @@ public class DefinePhase extends SinglePassPhase {
 	public void exitVariableDecl(HogwashParser.VariableDeclContext ctx) {
 		Token name = ctx.name().Identifier().getSymbol();
 		boolean mutable = ctx.MUT() != null;
-		boolean exportable = ctx.EXT() != null;
+		boolean exportable = ctx.PUB() != null;
 		VariableSymbol var = this.defineVariable(ctx.typeDecl(), name, mutable, exportable);
 		if (var != null && ctx.variableInit() != null) var.setIsSet(true);
 

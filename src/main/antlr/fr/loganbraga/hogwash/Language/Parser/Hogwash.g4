@@ -58,7 +58,7 @@ block
     ;
 
 functionDecl
-    : FunctionVisibility? FUNC name LPAREN formalParameterList? RPAREN
+    : PUB? FUNC name LPAREN formalParameterList? RPAREN
         functionReturnType? block
     ;
 
@@ -211,7 +211,7 @@ variableDeclList
     ;
 
 variableDecl
-    : EXT? MUT? name (COLON typeDecl)? (EQUAL variableInit)?
+    : PUB? MUT? name (COLON typeDecl)? (EQUAL variableInit)?
     ;
 
 forVariableDecl
@@ -322,7 +322,7 @@ name
 // Keywords
 LET            : 'let';
 MUT            : 'mut';
-EXT            : 'ext';
+PUB            : 'pub';
 IF             : 'if';
 ELSE           : 'else';
 FOR            : 'for';
@@ -343,8 +343,6 @@ FUNC           : 'fn';
 DELETE         : 'delete';
 TRUE           : 'true';
 FALSE          : 'false';
-
-FunctionVisibility : 'pub' | 'priv';
 
 // Type Keywords
 T_TYPE         : 'any' | 'number' | 'string' | 'regex';

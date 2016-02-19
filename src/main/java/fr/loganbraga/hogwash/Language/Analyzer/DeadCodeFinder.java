@@ -34,6 +34,7 @@ public class DeadCodeFinder {
 
 	protected void handleVariable(VariableSymbol variable) {
 		ErrorKind ek;
+		if (variable.isExportable()) return;
 		if (!variable.isUsed())
 			ek = ErrorKind.VAR_NEVER_USED;
 		else if (!variable.isSet())

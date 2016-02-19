@@ -95,6 +95,9 @@ public class ModuleImporter extends HogwashBaseListener {
 				FunctionSymbol func = (FunctionSymbol) symbol;
 				if (func.getVisibility() == FunctionVisibility.PRIVATE)
 					toDelete.add(symbol);
+			} else if (symbol instanceof VariableSymbol) {
+				VariableSymbol var = (VariableSymbol) symbol;
+				if (!var.isExportable()) toDelete.add(symbol);
 			} else toDelete.add(symbol);
 		}
 

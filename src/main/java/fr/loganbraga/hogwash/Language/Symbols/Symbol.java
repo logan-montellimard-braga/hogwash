@@ -1,6 +1,7 @@
 package fr.loganbraga.hogwash.Language.Symbols;
 
 import fr.loganbraga.hogwash.Language.Symbols.*;
+import fr.loganbraga.hogwash.Language.Parser.NamedInputStream;
 import org.antlr.v4.runtime.Token;
 
 public abstract class Symbol {
@@ -56,5 +57,12 @@ public abstract class Symbol {
 
 	public String toString() {
 		return this.name;
+	}
+
+	public boolean fromSameModule(Token b) {
+		String thisModule = ((NamedInputStream) this.token.getInputStream()).getName();
+		String bModule = ((NamedInputStream) b.getInputStream()).getName();
+
+		return thisModule.equals(bModule);
 	}
 }

@@ -39,6 +39,6 @@ public class VariableSymbol extends Symbol {
 	}
 
 	public String toString() {
-		return (this.exportable ? "ext " : "") + (this.mutable ? "mut " : "") + this.name + ": " + this.type.getName();
+		return (this.exportable ? "pub " : "") + (this.mutable ? "mut " : "") + this.name + ": " + this.type.getName();
 	}
 }
