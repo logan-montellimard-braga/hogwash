@@ -79,6 +79,11 @@ public class DefinePhase extends SinglePassPhase {
 		VariableSymbol var = this.defineVariable(ctx.typeDecl(), name, mutable, exportable);
 		if (var != null && ctx.variableInit() != null) var.setIsSet(true);
 
+		if (mutable && exportable) {
+			ErrorMessage message = new ErrorMessage(ErrorKind.VAR_MUT_EXPORT, name.getText());
+			this.generateError(name, message);
+		}
+
 		if (!mutable && ctx.variableInit() == null) {
 			ErrorMessage message = new ErrorMessage(ErrorKind.CONST_NOT_SET, name.getText());
 			this.generateError(name, message);
