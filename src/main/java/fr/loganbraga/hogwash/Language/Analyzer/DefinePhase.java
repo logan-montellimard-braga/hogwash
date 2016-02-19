@@ -75,7 +75,8 @@ public class DefinePhase extends SinglePassPhase {
 			? ctx.formalParameterType().typeDecl()
 			: null;
 		Token name = ctx.name().Identifier().getSymbol();
-		this.defineVariable(t, name, true, false);
+		VariableSymbol var = this.defineVariable(t, name, true, false);
+		if (var != null) var.setIsSet(true);
 	}
 
 	@Override
@@ -83,7 +84,8 @@ public class DefinePhase extends SinglePassPhase {
 		Token name = ctx.name().Identifier().getSymbol();
 		boolean mutable = ctx.MUT() != null;
 		boolean exportable = ctx.EXT() != null;
-		this.defineVariable(ctx.typeDecl(), name, mutable, exportable);
+		VariableSymbol var = this.defineVariable(ctx.typeDecl(), name, mutable, exportable);
+		if (var != null && ctx.variableInit() != null) var.setIsSet(true);
 
 		if (!mutable && ctx.variableInit() == null) {
 			ErrorMessage message = new ErrorMessage(ErrorKind.CONST_NOT_SET, name.getText());
@@ -91,7 +93,7 @@ public class DefinePhase extends SinglePassPhase {
 		}
 	}
 
-	protected void defineVariable(HogwashParser.TypeDeclContext ctx,
+	protected VariableSymbol defineVariable(HogwashParser.TypeDeclContext ctx,
 			Token nameToken, boolean mutable, boolean exportable) {
         String name = nameToken.getText();
 
@@ -105,7 +107,9 @@ public class DefinePhase extends SinglePassPhase {
 			this.currentScope.define(var);
 		} catch (SymbolAlreadyExistsException e) {
 			this.alreadyExistsError(nameToken, var);
+			return null;
 		}
+		return var;
 	}
 
 	protected void alreadyExistsError(Token token, Symbol s) {

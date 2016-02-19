@@ -6,6 +6,8 @@ public class VariableSymbol extends Symbol {
 	protected boolean exportable;
 	protected boolean mutable;
 
+	protected boolean set;
+
 	public VariableSymbol(String name, Type type) {
 		this(name, type, false, false);
 	}
@@ -20,6 +22,13 @@ public class VariableSymbol extends Symbol {
 		this.exportable = exportable;
 	}
 
+	public boolean isSet() {
+		return this.set;
+	}
+
+	public void setIsSet(boolean isSet) {
+		this.set = isSet;
+	}
 
 	public boolean isExportable() {
 		return this.exportable;

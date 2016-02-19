@@ -25,34 +25,44 @@ public class DeadCodeFinder {
 
 		while (it.hasNext()) {
 			Symbol s = it.next();
-			if (s instanceof FunctionSymbol || s instanceof VariableSymbol) {
-				if (!s.isUsed()) {
-					if (s instanceof FunctionSymbol) {
-						FunctionSymbol f = (FunctionSymbol) s;
-						if (f.getVisibility() == FunctionVisibility.PUBLIC)
-							continue;
-					}
-					if (input == null) {
-						input = s.getToken().getInputStream().toString();
-						inputName = ((NamedInputStream) s.getToken().getInputStream()).getName();
-					}
-
-					ErrorKind k = s instanceof FunctionSymbol
-						? ErrorKind.FUNC_NEVER_CALLED
-						: ErrorKind.VAR_NEVER_USED;
-
-					Token token = s.getToken();
-					int line = token.getLine();
-					int charPos = token.getCharPositionInLine();
-					int charPosStop = charPos + s.getName().length() - 1;
-					ErrorMessage message = new ErrorMessage(k, s.getName());
-					BaseError warn = new LineCharError(message, inputName,
-							input, line, charPos, charPos, charPosStop);
-					warn.setLevel(ErrorLevel.WARNING);
-					this.er.addError(warn);
-				}
-			}
+			if (s instanceof VariableSymbol)
+				this.handleVariable((VariableSymbol) s);
+			else if (s instanceof FunctionSymbol)
+				this.handleFunction((FunctionSymbol) s);
 		}
+	}
+
+	protected void handleVariable(VariableSymbol variable) {
+		ErrorKind ek;
+		if (!variable.isUsed())
+			ek = ErrorKind.VAR_NEVER_USED;
+		else if (!variable.isSet())
+			ek = ErrorKind.VAR_NEVER_SET;
+		else return;
+
+		ErrorMessage em = new ErrorMessage(ek, variable.getName());
+		this.generateError(variable.getToken(), em);
+	}
+
+	protected void handleFunction(FunctionSymbol function) {
+		if (function.getVisibility() == FunctionVisibility.PUBLIC) return;
+		if (function.isUsed()) return;
+
+		ErrorMessage em = new ErrorMessage(ErrorKind.FUNC_NEVER_CALLED,
+				function.getName());
+		this.generateError(function.getToken(), em);
+	}
+
+	protected void generateError(Token token, ErrorMessage message) {
+		int line = token.getLine();
+		int charPos = token.getCharPositionInLine();
+		int charPosStop = charPos + token.getText().length() - 1;
+		String input = token.getInputStream().toString();
+		String inputName = ((NamedInputStream) token.getInputStream()).getName();
+		BaseError warn = new LineCharError(message, inputName,
+				input, line, charPos, charPos, charPosStop);
+		warn.setLevel(ErrorLevel.WARNING);
+		this.er.addError(warn);
 	}
 
 }

@@ -46,12 +46,12 @@ statement
     ;
 
 loopingStatement
-	: loopStatement
-	| whileStatement
-	| doWhileStatement SEMI
-	| forStatement
-	| forInStatement
-	;
+    : loopStatement
+    | whileStatement
+    | doWhileStatement SEMI
+    | forStatement
+    | forInStatement
+    ;
 
 block
     : LBRACE statement* RBRACE
@@ -96,7 +96,7 @@ expression
     | BANG expression                                   # NotExpression
     | <assoc=right>
         expression POW expression                       # PowExpression
-    | expression REGEX_MATCH expression					# RegexMatchExpression
+    | expression REGEX_MATCH expression                 # RegexMatchExpression
     | expression op=(MUL | DIV | MOD) expression        # MultExpression
     | expression op=(ADD | SUB) expression              # AddExpression
     | expression op=(LT | GT | LTE | GTE) expression    # CompExpression
@@ -105,7 +105,7 @@ expression
     | expression OR expression                          # OrExpression
     | expression QUESTION expression COLON expression   # TernaryIfExpression
     | <assoc=right>
-        expression assignmentOperator expression        # AssignExpression
+        lhs assignmentOperator expression               # AssignExpression
     | name                                              # IdentifierExpression
     | literal                                           # LiteralExpression
     | LPAREN expression RPAREN                          # ParenExpression
@@ -220,6 +220,10 @@ forVariableDecl
 
 variableInit
     : expression
+    ;
+
+lhs
+    : name
     ;
 
 assignmentOperator
@@ -343,7 +347,7 @@ FALSE          : 'false';
 FunctionVisibility : 'pub' | 'priv';
 
 // Type Keywords
-T_TYPE		   : 'any' | 'number' | 'string' | 'regex';
+T_TYPE         : 'any' | 'number' | 'string' | 'regex';
 T_VOID         : 'void';
 
 

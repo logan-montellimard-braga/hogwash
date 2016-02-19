@@ -58,14 +58,31 @@ public class ReferencePhase extends SinglePassPhase {
 	public void exitForInSource(HogwashParser.ForInSourceContext ctx) {
 		if (ctx.name() != null) {
 			Token tk = ctx.name().Identifier().getSymbol();
-			this.checkVariableReference(tk);
+			Symbol var = this.checkVariableReference(tk);
+			if (var != null) var.setIsUsed(true);
 		}
 	}
 
 	@Override
 	public void exitIdentifierExpression(HogwashParser.IdentifierExpressionContext ctx) {
 		Token tk = ctx.name().Identifier().getSymbol();
-		this.checkVariableReference(tk);
+		Symbol var = this.checkVariableReference(tk);
+		if (var != null) var.setIsUsed(true);
+	}
+
+	@Override
+	public void exitAssignExpression(HogwashParser.AssignExpressionContext ctx) {
+		Token tk = ctx.lhs().name().Identifier().getSymbol();
+		Symbol var = this.checkVariableReference(tk);
+		if (var instanceof VariableSymbol) {
+			VariableSymbol variable = (VariableSymbol) var;
+			variable.setIsSet(true);
+			boolean mutable = variable.isMutable();
+			if (!mutable) {
+				ErrorMessage em = new ErrorMessage(ErrorKind.CONST_SET, tk.getText());
+				this.generateError(tk, em);
+			}
+		}
 	}
 
 	@Override
@@ -95,7 +112,7 @@ public class ReferencePhase extends SinglePassPhase {
 		}
 	}
 
-	protected void checkVariableReference(Token tk) {
+	protected Symbol checkVariableReference(Token tk) {
 		String name = tk.getText();
 		Symbol var = this.currentScope.resolve(name);
 		if (var == null) {
@@ -107,11 +124,12 @@ public class ReferencePhase extends SinglePassPhase {
 		} else {
 			int referencePosition = tk.getTokenIndex();
 			VariableSymbol v = (VariableSymbol) var;
-			v.setIsUsed(true);
+			// v.setIsUsed(true);
 			if (referencePosition < v.getToken().getTokenIndex()) {
 				ErrorMessage em = new ErrorMessage(ErrorKind.VAR_FORWARD_REF, name);
 				this.generateError(tk, em);
 			}
 		}
+		return var;
 	}
 }

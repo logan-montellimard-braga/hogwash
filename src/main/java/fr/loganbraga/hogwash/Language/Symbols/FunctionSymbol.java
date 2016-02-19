@@ -49,7 +49,8 @@ public class FunctionSymbol extends Symbol implements Scope {
 	}
 
 	public Collection<Symbol> getAllSymbols() {
-		return new ArrayList<Symbol>();
+		// return new ArrayList<Symbol>();
+		return this.arguments.getAllSymbols();
 	}
 
 	public String toString() {

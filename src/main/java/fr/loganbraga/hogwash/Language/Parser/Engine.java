@@ -22,6 +22,7 @@ public class Engine {
 		try {
 			is = new FileInputStream(file);
 			input = new NamedInputStream(is, file.getPath());
+			is.close();
 		} catch (IOException e) {
 			BaseError error = new BaseError(
 					new ErrorMessage(ErrorKind.BASE_ERROR, e.getMessage()));
