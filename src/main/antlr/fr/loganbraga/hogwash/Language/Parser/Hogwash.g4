@@ -215,7 +215,7 @@ variableDecl
     ;
 
 forVariableDecl
-    : LET name (COLON typeDecl)?
+    : LET variableDecl
     ;
 
 variableInit
