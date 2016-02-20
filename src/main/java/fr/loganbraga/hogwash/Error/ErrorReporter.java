@@ -84,7 +84,14 @@ public class ErrorReporter {
 
 		if (shouldExplain) {
 			sb.append("\n");
-			sb.append("Use `hogwash --explain CODE` with the given error code to see a detailed explanation.");
+			String message;
+			if (coll.size() == 1)
+				message = "Use `hogwash --explain " + coll.get(0).getMessage().getErrorKind().getErrorCode() + "`";
+			else
+				message = "Use `hogwash --explain CODE` with one of the given error code";
+
+			message = message + " to see a detailed explanation.";
+			sb.append(message);
 			sb.append("\n");
 		}
 
