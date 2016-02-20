@@ -70,13 +70,22 @@ public class ErrorReporter {
 	}
 
 	protected String report(List<BaseError> coll) {
+		boolean shouldExplain = false;
 		StringBuilder sb = new StringBuilder();
 		Iterator<BaseError> it = coll.iterator();
 		while (it.hasNext()) {
 			BaseError err = it.next();
+			if (err.hasErrorCode())
+				shouldExplain = true;
 			err.setErrorKeys(this.errorKeys);
 			sb.append(err + "\n");
 			if (it.hasNext()) sb.append("\n");
+		}
+
+		if (shouldExplain) {
+			sb.append("\n");
+			sb.append("Use `hogwash --explain CODE` with the given error code to see a detailed explanation.");
+			sb.append("\n");
 		}
 
 		return sb.toString();

@@ -1,7 +1,8 @@
 package fr.loganbraga.hogwash;
 
 import fr.loganbraga.hogwash.Language.Compiler;
-import fr.loganbraga.hogwash.Parameters;
+import fr.loganbraga.hogwash.Front.Parameters;
+import fr.loganbraga.hogwash.Front.Explainer;
 import fr.loganbraga.hogwash.Error.*;
 import java.io.File;
 import java.util.ResourceBundle;
@@ -60,6 +61,12 @@ public class Hogwash implements Observer {
 			parameters.parse(args);
 			if (parameters.help || args.length == 0) {
 				System.out.println(parameters.printHelp());
+				System.exit(0);
+			}
+
+			if (parameters.explain != null) {
+				Explainer explainer = new Explainer(preArgsER);
+				System.out.println(explainer.explain(parameters.explain));
 				System.exit(0);
 			}
 

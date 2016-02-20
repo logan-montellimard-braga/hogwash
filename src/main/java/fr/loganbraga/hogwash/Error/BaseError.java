@@ -10,6 +10,7 @@ public class BaseError {
 	protected ErrorMessage message;
 	protected ErrorLevel level;
 	protected ResourceBundle errorKeys;
+	protected String errorCode;
 
 	public BaseError(ErrorMessage message) {
 		this(message, ErrorLevel.ERROR);
@@ -18,6 +19,8 @@ public class BaseError {
 	public BaseError(ErrorMessage message, ErrorLevel level) {
 		this.message = message;
 		this.level = level;
+
+		this.errorCode = message.getErrorKind().getErrorCode();
 	}
 
 	public ErrorMessage getMessage() {
@@ -40,6 +43,10 @@ public class BaseError {
 		this.errorKeys = errorKeys;
 	}
 
+	public boolean hasErrorCode() {
+		return this.errorCode != null;
+	}
+
 	protected String getColorByLevel(ErrorLevel level) {
 		String color;
 		switch(level) {
@@ -58,6 +65,9 @@ public class BaseError {
 		sb.append("@|" + this.getColorByLevel(this.level) + " ");
 		sb.append(this.level.name().toLowerCase() + ":|@ ");
 		sb.append("@|bold " + this.message.render(this.errorKeys) + "|@");
+		if (this.errorCode != null)
+			sb.append(" [" + this.errorCode + "]");
+
 		return render(sb.toString());
 	}
 }

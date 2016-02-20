@@ -1,4 +1,4 @@
-package fr.loganbraga.hogwash;
+package fr.loganbraga.hogwash.Front;
 
 import fr.loganbraga.hogwash.Error.*;
 import com.beust.jcommander.Parameter;
@@ -14,19 +14,22 @@ public class Parameters {
 	private String version;
 	private ErrorReporter er;
 
-	@Parameter(description = "<files>")
+	@Parameter(description = "<file>")
 	public List<String> files;
 
-	@Parameter(names = "--quick-fail", description = "Exit after first error.")
+	@Parameter(names = "--quick-fail", description = "Exit after first error")
 	public boolean quickFail;
 
-	@Parameter(names = "--no-warnings", description = "Disable warnings.")
+	@Parameter(names = "--no-warnings", description = "Disable warnings")
 	public boolean noWarnings;
 
-	@Parameter(names = "--strict", description = "Treat all warnings as errors.")
+	@Parameter(names = "--strict", description = "Treat all warnings as errors")
 	public boolean strict;
 
-	@Parameter(names = "--help", description = "Show this help and exit.", help = true)
+	@Parameter(names = "--explain", description = "Show detailed message about given error identifier")
+	public String explain;
+
+	@Parameter(names = "--help", description = "Show this help and exit", help = true)
 	public boolean help;
 
 
@@ -36,6 +39,7 @@ public class Parameters {
 		this.noWarnings = false;
 		this.strict = false;
 		this.help = false;
+		this.explain = null;
 
 		this.programName = programName;
 		this.version = version;

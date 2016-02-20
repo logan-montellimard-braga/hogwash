@@ -26,4 +26,8 @@ public class ErrorMessage {
 		return message;
 	}
 
+	public ErrorKind getErrorKind() {
+		return this.kind;
+	}
+
 }
