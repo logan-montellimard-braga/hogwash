@@ -86,6 +86,20 @@ public class ReferencePhase extends SinglePassPhase {
 	}
 
 	@Override
+	public void exitPostOpExpression(HogwashParser.PostOpExpressionContext ctx) {
+		Token tk = ctx.lhs().name().Identifier().getSymbol();
+		Symbol var = this.checkVariableReference(tk);
+		if (var instanceof VariableSymbol) {
+			VariableSymbol variable = (VariableSymbol) var;
+			boolean mutable = variable.isMutable();
+			if (!mutable) {
+				ErrorMessage em = new ErrorMessage(ErrorKind.CONST_SET, tk.getText());
+				this.generateError(tk, em);
+			}
+		}
+	}
+
+	@Override
 	public void exitFuncCallExpression(HogwashParser.FuncCallExpressionContext ctx) {
 		Token tk = ctx.Identifier().getSymbol();
 		String name = tk.getText();

@@ -90,9 +90,9 @@ expression
     : expression LBRACK expression RBRACK               # IndexExpression
     | ExtIdentifier arguments                           # ExtFuncCallExpression
     | Identifier arguments                              # FuncCallExpression
-    | expression op=(INC | DEC)                         # PostOpExpression
+    | lhs op=(INC | DEC)                                # PostOpExpression
     | DELETE expression                                 # DeleteExpression
-    | op=(INC | DEC | ADD | SUB) expression             # PreOpExpression
+    | op=(ADD | SUB) expression                         # UnaryOpExpression
     | BANG expression                                   # NotExpression
     | <assoc=right>
         expression POW expression                       # PowExpression
