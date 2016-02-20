@@ -111,23 +111,34 @@ public class DefinePhase extends SinglePassPhase {
 
 	protected void alreadyExistsError(Token token, Symbol s) {
 		String name = token.getText();
-		ErrorMessage message;
+		ErrorMessage message = null;
 		ErrorLevel level = ErrorLevel.ERROR;
 
-		Token originalDef = this.currentScope.resolve(name).getToken();
+		Symbol originalSym = this.currentScope.resolve(name);
+		Token originalDef = originalSym.getToken();
 		NamedInputStream nis = (NamedInputStream) originalDef.getInputStream();
 		String originalDefFile = nis.getName();
 		int originalDefLine = originalDef.getLine();
 		int originalDefChar = originalDef.getCharPositionInLine() + 1;
 
 		if (s instanceof FunctionSymbol) {
-			Token originalFunc = this.currentScope.resolve(name).getToken();
-			message = new ErrorMessage(ErrorKind.FUNC_ALREADY_DEF, name,
-					originalDefFile, originalDefLine, originalDefChar);
-		} else {
-			message = new ErrorMessage(ErrorKind.VAR_ALREADY_DEF, name,
-					originalDefFile, originalDefLine, originalDefChar);
-			level = ErrorLevel.WARNING;
+			if (originalSym instanceof FunctionSymbol) {
+				message = new ErrorMessage(ErrorKind.FUNC_ALREADY_DEF, name,
+						originalDefFile, originalDefLine, originalDefChar);
+			} else if (originalSym instanceof VariableSymbol) {
+				message = new ErrorMessage(ErrorKind.FUNC_DEF_VAR, name,
+						originalDefFile, originalDefLine, originalDefChar);
+			}
+		} else if (s instanceof VariableSymbol) {
+			if (originalSym instanceof VariableSymbol) {
+				message = new ErrorMessage(ErrorKind.VAR_ALREADY_DEF, name,
+						originalDefFile, originalDefLine, originalDefChar);
+				level = ErrorLevel.WARNING;
+			} else if (originalSym instanceof FunctionSymbol) {
+				message = new ErrorMessage(ErrorKind.VAR_DEF_FUNC, name,
+						originalDefFile, originalDefLine, originalDefChar);
+				level = ErrorLevel.ERROR;
+			}
 		}
 
 		if (this.currentScope instanceof FunctionSymbol) {
@@ -136,7 +147,7 @@ public class DefinePhase extends SinglePassPhase {
 			level = ErrorLevel.ERROR;
 		}
 
-		this.generateError(token, message, level);
+		if (message != null) this.generateError(token, message, level);
 	}
 
 }
