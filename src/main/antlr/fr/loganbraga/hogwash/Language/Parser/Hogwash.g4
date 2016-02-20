@@ -106,6 +106,7 @@ expression
     | expression QUESTION expression COLON expression   # TernaryIfExpression
     | <assoc=right>
         lhs assignmentOperator expression               # AssignExpression
+    | ExtIdentifier                                     # ExtIdentifierExpression
     | name                                              # IdentifierExpression
     | literal                                           # LiteralExpression
     | LPAREN expression RPAREN                          # ParenExpression

@@ -106,8 +106,19 @@ public class ReferencePhase extends SinglePassPhase {
 		Token tk = ctx.ExtIdentifier().getSymbol();
 		String name = tk.getText().substring(1);
 		Symbol func = this.currentScope.resolve(name);
-		if (func != null) {
+		if (func instanceof FunctionSymbol) {
 			ErrorMessage em = new ErrorMessage(ErrorKind.EXT_FUNC_DEF, name);
+			this.generateError(tk, em);
+		}
+	}
+
+	@Override
+	public void exitExtIdentifierExpression(HogwashParser.ExtIdentifierExpressionContext ctx) {
+		Token tk = ctx.ExtIdentifier().getSymbol();
+		String name = tk.getText().substring(1);
+		Symbol var = this.currentScope.resolve(name);
+		if (var instanceof VariableSymbol) {
+			ErrorMessage em = new ErrorMessage(ErrorKind.EXT_VAR_DEF, name);
 			this.generateError(tk, em);
 		}
 	}
