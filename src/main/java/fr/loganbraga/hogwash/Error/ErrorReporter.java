@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Comparator;
 import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
 
 public class ErrorReporter {
 
@@ -72,28 +74,31 @@ public class ErrorReporter {
 	}
 
 	protected String report(List<BaseError> coll, Comparator<BaseError> sorter) {
-		boolean shouldExplain = false;
+		Set<String> errorCodes = new HashSet<String>();
 		if (sorter != null) Collections.sort(coll, sorter);
 		StringBuilder sb = new StringBuilder();
 		Iterator<BaseError> it = coll.iterator();
 		while (it.hasNext()) {
 			BaseError err = it.next();
 			if (err.hasErrorCode())
-				shouldExplain = true;
+				errorCodes.add(err.getErrorCode());
 			err.setErrorKeys(this.errorKeys);
 			sb.append(err + "\n");
 			if (it.hasNext()) sb.append("\n");
 		}
 
-		if (shouldExplain) {
+		if (errorCodes.size() > 0) {
 			sb.append("\n");
 			String message;
-			if (coll.size() == 1)
-				message = "Use `hogwash --explain " + coll.get(0).getMessage().getErrorKind().getErrorCode() + "`";
-			else
-				message = "Use `hogwash --explain CODE` with one of the given error code";
+			if (errorCodes.size() == 1)
+				message = "Use `hogwash --explain " + errorCodes.iterator().next() + "` to see a detailed explanation";
+			else {
+				message = "Use `hogwash --explain CODE` with one of the given error codes to see a detailed explanation";
+				String codes = errorCodes.toString();
+				codes = codes.substring(1, codes.length() - 1);
+				message += "\nRelevant codes: " + codes;
+			}
 
-			message = message + " to see a detailed explanation.";
 			sb.append(message);
 			sb.append("\n");
 		}
