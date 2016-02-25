@@ -57,3 +57,8 @@ task fatJar(type: Jar) {
 generateGrammarSource {
     arguments += ["-visitor"]
 }
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+}
