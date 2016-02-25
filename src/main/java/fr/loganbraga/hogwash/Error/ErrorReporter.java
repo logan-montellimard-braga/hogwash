@@ -5,6 +5,8 @@ import java.util.ResourceBundle;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Comparator;
+import java.util.Collections;
 
 public class ErrorReporter {
 
@@ -61,16 +63,17 @@ public class ErrorReporter {
 		return !this.warnings.isEmpty();
 	}
 
-	public String reportErrors() {
-		return this.report(this.errors);
+	public String reportErrors(Comparator<BaseError> sorter) {
+		return this.report(this.errors, sorter);
 	}
 
-	public String reportWarnings() {
-		return this.report(this.warnings);
+	public String reportWarnings(Comparator<BaseError> sorter) {
+		return this.report(this.warnings, sorter);
 	}
 
-	protected String report(List<BaseError> coll) {
+	protected String report(List<BaseError> coll, Comparator<BaseError> sorter) {
 		boolean shouldExplain = false;
+		if (sorter != null) Collections.sort(coll, sorter);
 		StringBuilder sb = new StringBuilder();
 		Iterator<BaseError> it = coll.iterator();
 		while (it.hasNext()) {
@@ -105,6 +108,47 @@ public class ErrorReporter {
 
 	public int getMaxErrors() {
 		return this.maxErrors;
+	}
+
+	public static class CodeErrorSorter implements Comparator<BaseError> {
+		public int compare(BaseError e1, BaseError e2) {
+			return e1.getErrorCode().compareTo(e2.getErrorCode());
+		}
+
+		public String toString() {
+			return "code";
+		}
+	}
+
+	public static class LineErrorSorter implements Comparator<BaseError> {
+		public int compare(BaseError e1, BaseError e2) {
+			String e1Name = e1.getInputName();
+			String e2Name = e2.getInputName();
+			if (!e1Name.equals(e2Name))
+				return e1Name.compareTo(e2Name);
+
+			if (e1 instanceof LineCharError && e2 instanceof LineCharError) {
+				LineCharError lce1 = (LineCharError) e1;
+				LineCharError lce2 = (LineCharError) e2;
+				int e1Line = lce1.getLine();
+				int e2Line = lce2.getLine();
+				int cmp;
+				if (e1Line == e2Line) {
+					int e1Char = lce1.getCharPos();
+					int e2Char = lce2.getCharPos();
+					cmp = e1Char > e2Char ? 1 : 0;
+					if (cmp == 0) cmp = e1Char == e2Char ? 0 : -1;
+				} else {
+					cmp = e1Line > e2Line ? 1 : -1;
+				}
+				return cmp;
+			}
+			return 0;
+		}
+
+		public String toString() {
+			return "line";
+		}
 	}
 
 }

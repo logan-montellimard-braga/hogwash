@@ -7,6 +7,7 @@ import static org.fusesource.jansi.AnsiRenderer.*;
 public class BaseError {
 	protected static final String ERROR_COLOR = "red";
 	protected static final String WARNING_COLOR = "yellow";
+	protected String inputName;
 	protected ErrorMessage message;
 	protected ErrorLevel level;
 	protected ResourceBundle errorKeys;
@@ -21,6 +22,7 @@ public class BaseError {
 		this.level = level;
 
 		this.errorCode = message.getErrorKind().getErrorCode();
+		this.inputName = "";
 	}
 
 	public ErrorMessage getMessage() {
@@ -43,8 +45,16 @@ public class BaseError {
 		this.errorKeys = errorKeys;
 	}
 
+	public String getInputName() {
+		return this.inputName;
+	}
+
 	public boolean hasErrorCode() {
 		return this.errorCode != null;
+	}
+
+	public String getErrorCode() {
+		return this.errorCode;
 	}
 
 	protected String getColorByLevel(ErrorLevel level) {

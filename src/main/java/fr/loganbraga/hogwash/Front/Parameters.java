@@ -1,11 +1,11 @@
 package fr.loganbraga.hogwash.Front;
 
 import fr.loganbraga.hogwash.Error.*;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.*;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Comparator;
 
 public class Parameters {
 
@@ -19,6 +19,9 @@ public class Parameters {
 
 	@Parameter(names = "--quick-fail", description = "Exit after first error")
 	public boolean quickFail;
+
+	@Parameter(names = "--sort-by", description = "Sorting method for errors and warnings (line | code)", validateWith = ValidSortBy.class, converter = SortByConverter.class)
+	public Comparator<BaseError> errorSorting;
 
 	@Parameter(names = "--no-warnings", description = "Disable warnings")
 	public boolean noWarnings;
@@ -36,6 +39,7 @@ public class Parameters {
 	public Parameters(String programName, String version, ErrorReporter er) {
 		this.files = new ArrayList<String>();
 		this.quickFail = false;
+		this.errorSorting = new ErrorReporter.LineErrorSorter();
 		this.noWarnings = false;
 		this.strict = false;
 		this.help = false;
@@ -69,6 +73,29 @@ public class Parameters {
 		sb.append("\n\n");
 		this.parser.usage(sb);
 		return sb.toString();
+	}
+
+	public static class ValidSortBy implements IParameterValidator {
+		@Override
+		public void validate(String name, String value) throws ParameterException {
+			HashSet<String> sorts = new HashSet<String>();
+			sorts.add("line");
+			sorts.add("code");
+			if (!sorts.contains(value.toLowerCase()))
+				throw new ParameterException("parameter `" + name + "` should be one of " + sorts.toString() + " but was `" + value + "`");
+		}
+	}
+
+	public static class SortByConverter implements IStringConverter<Comparator<BaseError>> {
+		@Override
+		public Comparator<BaseError> convert(String value) {
+			switch(value) {
+				case "code":
+					return new ErrorReporter.CodeErrorSorter();
+				default:
+					return new ErrorReporter.LineErrorSorter();
+			}
+		}
 	}
 
 }

@@ -5,7 +5,6 @@ import static org.fusesource.jansi.AnsiRenderer.*;
 
 public class LineCharError extends BaseError {
 	protected String input;
-	protected String inputName;
 	protected int line;
 	protected int charPos;
 	protected int errorCharStartPos;
@@ -60,5 +59,13 @@ public class LineCharError extends BaseError {
 							(i == this.errorCharStartPos ? "^" : "~") + "|@"));
 
 		return sb.toString();
+	}
+
+	public int getLine() {
+		return this.line;
+	}
+
+	public int getCharPos() {
+		return this.charPos;
 	}
 }

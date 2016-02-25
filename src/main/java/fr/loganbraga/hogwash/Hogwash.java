@@ -37,10 +37,10 @@ public class Hogwash implements Observer {
 
 	protected void handleErrors(ErrorReporter er) {
 		if (er.hasErrors()) {
-			System.err.print(er.reportErrors());
+			System.err.print(er.reportErrors(this.parameters.errorSorting));
 			System.exit(1);
 		}
-		if (er.hasWarnings()) System.err.print(er.reportWarnings());
+		if (er.hasWarnings()) System.err.print(er.reportWarnings(this.parameters.errorSorting));
 	}
 
 	public void update(Observable o, Object message) {
@@ -73,7 +73,7 @@ public class Hogwash implements Observer {
 			hogwash = new Hogwash(parameters);
 			hogwash.run();
 		} catch (TooManyErrorsException e) { 
-			System.err.print(e.getErrorReporter().reportErrors());
+			System.err.print(e.getErrorReporter().reportErrors(parameters.errorSorting));
 			System.exit(1);
 		}
 
