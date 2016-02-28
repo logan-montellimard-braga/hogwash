@@ -75,6 +75,12 @@ public class Hogwash implements Observer {
 		} catch (TooManyErrorsException e) { 
 			System.err.print(e.getErrorReporter().reportErrors(parameters.errorSorting));
 			System.exit(1);
+		} catch (Exception e) {
+			ErrorReporter exceptionalErrorRep = new ErrorReporter(50, ERROR_KEYS);
+			exceptionalErrorRep.addError(new BaseError(
+						new ErrorMessage(ErrorKind.EXCEPTIONAL_ERROR, e.getMessage())));
+			System.err.print(exceptionalErrorRep.reportErrors(null));
+			System.exit(2);
 		}
 
 		AnsiConsole.systemUninstall();

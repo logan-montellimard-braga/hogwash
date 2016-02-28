@@ -2,6 +2,7 @@ package fr.loganbraga.hogwash.Error;
 
 public enum ErrorKind {
 	BASE_ERROR(null),
+	EXCEPTIONAL_ERROR(null),
 	EXPLAIN_BAD_CODE(null),
 	EXPLAIN_NOT_FOUND(null),
 	BUILTINS_BOOTSTRAP("E001"),
