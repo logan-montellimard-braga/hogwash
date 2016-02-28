@@ -40,7 +40,7 @@ public class SymbolTable {
 				PrimitiveTypeSymbol t = (PrimitiveTypeSymbol) this.globalScope.resolve(noType);
 				FunctionSymbol f = new FunctionSymbol(
 						it.next(), t, this.globalScope, FunctionVisibility.PUBLIC);
-				f.setIsUsed(true);
+				f.setIsBuiltin(true);
 				this.globalScope.define(f);
 			}
 		} catch (SymbolAlreadyExistsException e) {

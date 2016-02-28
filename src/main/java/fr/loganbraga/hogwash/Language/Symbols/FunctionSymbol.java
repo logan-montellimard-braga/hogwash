@@ -8,6 +8,7 @@ public class FunctionSymbol extends Symbol implements Scope {
 	protected SymbolDictionary arguments;
 	protected Scope enclosingScope;
 	protected FunctionVisibility visibility;
+	protected boolean builtin;
 
 	public FunctionSymbol(String name, Type returnType, Scope enclosingScope) {
 		this(name, returnType, enclosingScope, FunctionVisibility.PRIVATE);
@@ -42,6 +43,27 @@ public class FunctionSymbol extends Symbol implements Scope {
 
 	public String getScopeName() {
 		return this.name;
+	}
+
+	public void setIsBuiltin(boolean builtin) {
+		this.builtin = builtin;
+	}
+
+	public boolean isBuiltin() {
+		return this.builtin;
+	}
+
+	public int getMinArity() {
+		int arity = 0;
+		for (Symbol sym : this.arguments.getAllSymbols()) {
+			ArgumentSymbol arg = (ArgumentSymbol) sym;
+			if (!arg.hasDefault()) arity++;
+		}
+		return arity;
+	}
+
+	public int getMaxArity() {
+		return this.arguments.size();
 	}
 
 	public FunctionVisibility getVisibility() {

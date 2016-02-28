@@ -47,6 +47,18 @@ public class DefinePhase extends SinglePassPhase {
 
 	@Override
 	public void exitFunctionDecl(HogwashParser.FunctionDeclContext ctx) {
+		boolean optionalArgsStarted = false;
+		for (Symbol sym : this.currentScope.getAllSymbols()) {
+			ArgumentSymbol arg = (ArgumentSymbol) sym;
+			if (arg.hasDefault()) optionalArgsStarted = true;
+			else if (optionalArgsStarted) {
+				Token tk = arg.getToken();
+				String name = tk.getText();
+				ErrorMessage em = new ErrorMessage(ErrorKind.OPT_ARG_NOT_LAST, name);
+				this.generateError(arg.getToken(), em);
+				break;
+			}
+		}
 		this.currentScope = this.currentScope.getEnclosingScope();
 	}
 
@@ -68,7 +80,12 @@ public class DefinePhase extends SinglePassPhase {
 			: null;
 		Token name = ctx.name().Identifier().getSymbol();
 		VariableSymbol var = this.defineVariable(t, name, true, false);
-		if (var != null) var.setIsSet(true);
+		if (var != null) {
+			if (ctx.formalParameterDefaultValue() != null) {
+				((ArgumentSymbol) var).setHasDefault(true);
+			}
+			var.setIsSet(true);
+		}
 	}
 
 	@Override
@@ -99,6 +116,9 @@ public class DefinePhase extends SinglePassPhase {
 		PrimitiveTypeSymbol type = (PrimitiveTypeSymbol) this.currentScope.resolve(typeStr);
 
 		VariableSymbol var = new VariableSymbol(name, type, mutable, exportable);
+		if (this.currentScope instanceof FunctionSymbol) {
+			var = new ArgumentSymbol(name, type);
+		}
 		var.setToken(nameToken);
 		try {
 			this.currentScope.define(var);

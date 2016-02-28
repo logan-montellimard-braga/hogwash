@@ -32,6 +32,10 @@ public class SymbolDictionary {
 		return this.symbols.values();
 	}
 
+	public int size() {
+		return this.symbols.size();
+	}
+
 	public String toString() {
 		return this.symbols.values().toString();
 	}

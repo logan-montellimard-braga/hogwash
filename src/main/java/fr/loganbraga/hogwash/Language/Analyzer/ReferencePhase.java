@@ -107,11 +107,33 @@ public class ReferencePhase extends SinglePassPhase {
 		if (func == null) {
 			ErrorMessage em = new ErrorMessage(ErrorKind.FUNC_NOT_FOUND, name);
 			this.generateError(tk, em);
+			return;
 		} else if (func instanceof VariableSymbol) {
 			ErrorMessage em = new ErrorMessage(ErrorKind.VAR_CALLED, name);
 			this.generateError(tk, em);
+			return;
 		} else {
 			func.setIsUsed(true);
+			FunctionSymbol f = (FunctionSymbol) func;
+			if (f.isBuiltin()) return;
+			int argsSent = 0;
+			if (ctx.arguments().argumentsList() != null) {
+				argsSent = ctx.arguments().argumentsList().getChildCount();
+			}
+			if (argsSent > 1) { argsSent -= argsSent / 2; }
+			int maxArity = f.getMaxArity();
+			int minArity = f.getMinArity();
+			if (argsSent > maxArity || argsSent < minArity) {
+				ErrorMessage em = null;
+				if (maxArity == minArity) {
+					em = new ErrorMessage(
+							ErrorKind.FUNC_WRONG_ARITY_F, name, argsSent, maxArity);
+				} else {
+					em = new ErrorMessage(
+							ErrorKind.FUNC_WRONG_ARITY, name, argsSent, minArity, maxArity);
+				}
+				this.generateError(tk, em);
+			}
 		}
 	}
 
