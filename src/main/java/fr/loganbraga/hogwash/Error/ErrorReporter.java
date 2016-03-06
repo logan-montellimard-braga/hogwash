@@ -87,6 +87,13 @@ public class ErrorReporter {
 			if (it.hasNext()) sb.append("\n");
 		}
 
+		if (coll.size() > 0) {
+			sb.append("\n");
+			sb.append("Reported ");
+			sb.append(coll.size());
+			sb.append(" " + (coll.size() == 1 ? "notice" : "notices") + ".");
+		}
+
 		if (errorCodes.size() > 0) {
 			sb.append("\n");
 			String message;
