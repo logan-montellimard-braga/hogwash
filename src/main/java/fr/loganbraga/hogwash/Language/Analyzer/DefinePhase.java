@@ -136,10 +136,19 @@ public class DefinePhase extends SinglePassPhase {
 
 		Symbol originalSym = this.currentScope.resolve(name);
 		Token originalDef = originalSym.getToken();
-		NamedInputStream nis = (NamedInputStream) originalDef.getInputStream();
-		String originalDefFile = nis.getName();
-		int originalDefLine = originalDef.getLine();
-		int originalDefChar = originalDef.getCharPositionInLine() + 1;
+		String originalDefFile = "";
+		int originalDefLine;
+		int originalDefChar;
+		if (originalDef == null) {
+			originalDefFile = "<builtin>";
+			originalDefLine = 0;
+			originalDefChar = 0;
+		} else {
+			NamedInputStream nis = (NamedInputStream) originalDef.getInputStream();
+			originalDefFile = nis.getName();
+			originalDefLine = originalDef.getLine();
+			originalDefChar = originalDef.getCharPositionInLine() + 1;
+		}
 
 		if (s instanceof FunctionSymbol) {
 			if (originalSym instanceof FunctionSymbol) {
