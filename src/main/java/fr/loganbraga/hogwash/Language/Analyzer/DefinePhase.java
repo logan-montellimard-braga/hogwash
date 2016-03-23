@@ -4,6 +4,7 @@ import fr.loganbraga.hogwash.Language.Symbols.*;
 import fr.loganbraga.hogwash.Language.Parser.*;
 import fr.loganbraga.hogwash.Error.*;
 import org.antlr.v4.runtime.Token;
+import java.util.regex.*;
 
 public class DefinePhase extends SinglePassPhase {
 
@@ -96,15 +97,32 @@ public class DefinePhase extends SinglePassPhase {
 		VariableSymbol var = this.defineVariable(ctx.typeDecl(), name, mutable, exportable);
 		if (var != null && ctx.variableInit() != null) var.setIsSet(true);
 
+		String text = name.getText();
+
 		if (mutable && exportable) {
-			ErrorMessage message = new ErrorMessage(ErrorKind.VAR_MUT_EXPORT, name.getText());
+			ErrorMessage message = new ErrorMessage(ErrorKind.VAR_MUT_EXPORT, text);
 			this.generateError(name, message);
 		}
 
 		if (!mutable && ctx.variableInit() == null) {
-			ErrorMessage message = new ErrorMessage(ErrorKind.CONST_NOT_SET, name.getText());
+			ErrorMessage message = new ErrorMessage(ErrorKind.CONST_NOT_SET, text);
 			this.generateError(name, message);
 		}
+
+		if (!isNameSafe(text)) {
+			ErrorMessage message = new ErrorMessage(ErrorKind.UNSAFE_NAME, text);
+			this.generateError(name, message, ErrorLevel.WARNING);
+		}
+
+		if (text.toUpperCase().equals(text) && mutable) {
+			ErrorMessage message = new ErrorMessage(ErrorKind.UPPERCASE_MUT, text);
+			this.generateError(name, message, ErrorLevel.WARNING);
+		}
+	}
+
+	protected boolean isNameSafe(String name) {
+		Pattern pattern = Pattern.compile("__[^_]");
+		return !pattern.matcher(name).matches();
 	}
 
 	protected VariableSymbol defineVariable(HogwashParser.TypeDeclContext ctx,
