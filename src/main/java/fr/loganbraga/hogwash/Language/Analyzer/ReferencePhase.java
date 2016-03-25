@@ -27,6 +27,26 @@ public class ReferencePhase extends SinglePassPhase {
 	}
 
 	@Override
+	public void enterForStatement(HogwashParser.ForStatementContext ctx) {
+		this.currentScope = this.st.getScope(ctx);
+	}
+
+	@Override
+	public void exitForStatement(HogwashParser.ForStatementContext ctx) {
+		this.currentScope = this.currentScope.getEnclosingScope();
+	}
+
+	@Override
+	public void enterForInStatement(HogwashParser.ForInStatementContext ctx) {
+		this.currentScope = this.st.getScope(ctx);
+	}
+
+	@Override
+	public void exitForInStatement(HogwashParser.ForInStatementContext ctx) {
+		this.currentScope = this.currentScope.getEnclosingScope();
+	}
+
+	@Override
 	public void enterBlock(HogwashParser.BlockContext ctx) {
 		this.currentScope = this.st.getScope(ctx);
 	}

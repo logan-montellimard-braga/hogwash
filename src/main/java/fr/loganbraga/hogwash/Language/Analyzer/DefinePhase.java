@@ -64,6 +64,28 @@ public class DefinePhase extends SinglePassPhase {
 	}
 
 	@Override
+	public void enterForStatement(HogwashParser.ForStatementContext ctx) {
+		this.currentScope = new ForScope(currentScope);
+		this.st.addScope(ctx, this.currentScope);
+	}
+
+	@Override
+	public void exitForStatement(HogwashParser.ForStatementContext ctx) {
+		this.currentScope = this.currentScope.getEnclosingScope();
+	}
+
+	@Override
+	public void enterForInStatement(HogwashParser.ForInStatementContext ctx) {
+		this.currentScope = new ForScope(currentScope);
+		this.st.addScope(ctx, this.currentScope);
+	}
+
+	@Override
+	public void exitForInStatement(HogwashParser.ForInStatementContext ctx) {
+		this.currentScope = this.currentScope.getEnclosingScope();
+	}
+
+	@Override
 	public void enterBlock(HogwashParser.BlockContext ctx) {
 		this.currentScope = new LocalScope(currentScope);
 		this.st.addScope(ctx, this.currentScope);
