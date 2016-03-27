@@ -91,6 +91,7 @@ public class ModuleImporter extends HogwashBaseListener {
 		GlobalScope scope = this.st.getGlobalScope();
 		ArrayList<Symbol> toDelete = new ArrayList<Symbol>();
 		for (Symbol symbol : scope.getAllSymbols()) {
+			if (symbol instanceof Type) continue;
 			if (symbol instanceof FunctionSymbol) {
 				FunctionSymbol func = (FunctionSymbol) symbol;
 				if (func.getVisibility() == FunctionVisibility.PRIVATE)
