@@ -1,0 +1,44 @@
+header(date, version) ::= <<
+#!/usr/bin/env bash
+#
+# This file was automatically generated from a Hogwash script.
+# <date>, Hogwash v<version>
+#
+# See https://github.com/loganbraga/hogwash for additional information.
+
+>>
+
+function(name, args, stats) ::= <<
+function <name> () {
+	<args; separator="\n">
+	<stats; separator="\n">
+}
+>>
+
+emptyFunction(name) ::= <<
+function <name> () {
+  : # empty function
+}
+>>
+
+mainFunction(stats) ::= <<
+function main () {
+  <if(stats)><stats;separator="\n"><else>: # empty function<endif>
+}
+>>
+
+functionArgument(name, count, default) ::= <<
+local <name>=<if(default)>"${<count>:-<default>}"<else>"${<count>}"<endif>;
+>>
+
+variableDeclaration(name, init) ::= <<
+declare -r <name>=<init>;
+>>
+
+mutableVariableDeclaration(name, init) ::= <<
+declare <name><if(init)>=<init><endif>;
+>>
+
+variableReference(name) ::= <<
+"${<name>}"
+>>

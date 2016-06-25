@@ -4,6 +4,7 @@ import fr.loganbraga.hogwash.Error.*;
 import fr.loganbraga.hogwash.Language.Parser.Engine;
 import fr.loganbraga.hogwash.Language.Analyzer.StaticAnalyzer;
 import fr.loganbraga.hogwash.Language.Analyzer.SymbolTable;
+import fr.loganbraga.hogwash.Generator.*;
 import java.io.*;
 import java.util.Observer;
 import java.util.Observable;
@@ -47,6 +48,9 @@ public class Compiler extends Observable {
 		analyzer.analyze(this.st, this.file);
 		this.setChanged();
 		this.notifyObservers(Message.END_ANALYSIS);
+
+		BashGenerator gen = new BashGenerator(parser.getTree(), this.er);
+		gen.generate();
 	}
 
 	public ErrorReporter getErrorReporter() {
