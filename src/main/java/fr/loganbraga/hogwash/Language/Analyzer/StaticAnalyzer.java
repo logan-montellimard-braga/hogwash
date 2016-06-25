@@ -25,12 +25,14 @@ public class StaticAnalyzer {
 		ModuleImporter mi = new ModuleImporter(st, currentFile, this.er);
 		DefinePhase def = new DefinePhase(st, this.er);
 		ReferencePhase ref = new ReferencePhase(st, this.er);
+		TypeChecker tc = new TypeChecker(st, this.er);
 		DeadCodeFinder dcf = new DeadCodeFinder(st, this.er);
 
 		ParseTreeWalker walker = new ParseTreeWalker();
 		walker.walk(mi, this.tree);
 		walker.walk(def, this.tree);
 		walker.walk(ref, this.tree);
+		walker.walk(tc, this.tree);
 		dcf.process();
 	}
 
